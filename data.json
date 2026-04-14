@@ -1,0 +1,223 @@
+{
+  "vehicles": {
+    "cayman": {
+      "id": "cayman",
+      "make": "Porsche",
+      "model": "718 Cayman",
+      "year": 2017,
+      "color": "Black",
+      "accentClass": "cayman",
+      "accentColor": "#c8a96e",
+      "accentDim": "rgba(200,169,110,0.15)",
+      "headerClass": "cayman-header",
+      "navClass": "",
+      "tabBadgeClass": "vtab-badge-cayman",
+      "odoClass": "cayman",
+      "ownershipStart": "Dec 2023",
+      "firstServiceDate": "Jan 2017",
+      "latestServiceDate": "Mar 2026",
+      "currentOdometer": 71774,
+      "odometerAtAcquisition": 57181,
+      "milesSinceAcquisition": 14593,
+      "stats": [
+        { "number": "35+",  "label": "Service Records" },
+        { "number": "9",    "label": "Oil Changes" },
+        { "number": "7.7K", "label": "Avg Miles / Year" },
+        { "number": "1",    "label": "Major Repairs" }
+      ],
+      "alert": {
+        "icon": "⚠️",
+        "titleClass": "danger",
+        "title": "Major Repair — March 2026",
+        "body": "Turbocharger replaced/repaired + oil line seal(s) replaced at 71,774 mi. Most significant repair in the vehicle's service history. Performed at European Service Center."
+      },
+      "ownershipBadgeText": "You've added ~14,593 miles since acquiring in Dec 2023",
+      "mileageRows": [
+        { "label": "Delivery", "pct": 0.02, "value": "16 mi",       "valueClass": "dim" },
+        { "label": "Acquired", "pct": 77,   "value": "57,181 mi",   "valueClass": "dim" },
+        { "label": "Current",  "pct": 100,  "value": "71,774 mi",   "valueClass": "cayman" }
+      ],
+      "overviewCards": [
+        { "type": "routine",  "date": "Ongoing · 2017–2026",   "title": "Routine Oil Changes",       "shop": "Porsche Dallas → European Service Center", "body": "9 documented oil and filter changes throughout ownership." },
+        { "type": "brake",    "date": "Aug 2025 · 66,793 mi",  "title": "Full Brake Overhaul",        "shop": "European Service Center", "body": "Front and rear pads + rotors, pad sensors, brake fluid flushed.", "odo": "66,793 mi" },
+        { "type": "cooling",  "date": "Mar–Apr 2024 · ~59K mi","title": "Cooling System Rebuild",     "shop": "European Service Center", "body": "Water pump, serpentine belt, drive belts, thermostat, coolant temp sensor, spark plugs replaced.", "odo": "59,679–59,837 mi" },
+        { "type": "major",    "date": "Mar 2026 · 71,774 mi",  "title": "Turbocharger Replacement",  "shop": "European Service Center", "body": "Turbocharger replaced/repaired along with oil line seals. Largest single repair in vehicle history.", "odo": "71,774 mi" }
+      ],
+      "chartServiceTypes": {
+        "labels": ["2017","2018","2019","2020","2021","2022","2023","2024","2025","2026"],
+        "datasets": [
+          { "label": "Routine/Oil",  "color": "#5b9bd5", "data": [2,1,2,2,3,2,2,1,0,1] },
+          { "label": "Brakes",       "color": "#5dba7d", "data": [0,0,0,0,0,1,0,0,1,0] },
+          { "label": "Cooling",      "color": "#c86e9a", "data": [0,1,1,0,0,0,0,2,0,0] },
+          { "label": "Engine/Belts", "color": "#e08c55", "data": [0,0,0,0,0,0,0,1,0,0] },
+          { "label": "Electrical",   "color": "#e0d055", "data": [0,0,0,0,0,1,0,1,0,0] },
+          { "label": "Tires",        "color": "#8b8b8b", "data": [0,1,1,1,1,0,1,0,0,0] },
+          { "label": "Turbo/Major",  "color": "#c8a96e", "data": [0,0,0,0,0,0,0,0,0,1] }
+        ]
+      },
+      "chartMiles": {
+        "labels": ["2017","2018","2019","2020","2021","2022","2023","2024","2025","2026"],
+        "data": [7830,9200,9700,8500,9200,5900,7000,5970,5890,2705],
+        "partialYear": "2026"
+      },
+      "shops": [
+        { "name": "Porsche Dallas",           "visits": 20, "period": "2017–2023", "note": "Primary shop through original ownership. Dealer-level service." },
+        { "name": "European Service Center",  "visits": 7,  "period": "2024–2026", "note": "Current primary shop. All major repairs since acquisition." },
+        { "name": "Alternative Automotive",   "visits": 1,  "period": "Sep 2023",  "note": "Single oil change at 55,798 mi." },
+        { "name": "Self / DIY",               "visits": 2,  "period": "Nov 2023",  "note": "Self-reported tire rotation and safety inspection." },
+        { "name": "Texas DMV",                "visits": 5,  "period": "2022–2026", "note": "Annual registration, emissions and safety inspections." }
+      ],
+      "sections": [
+        { "id": "overview",   "label": "Overview",            "dotColor": "#5b9bd5" },
+        { "id": "timeline",   "label": "Full Timeline",       "dotColor": "#c8a96e", "count": 35 },
+        { "id": "engine",     "label": "Engine & Drivetrain", "dotColor": "#e08c55", "count": 6 },
+        { "id": "brakes",     "label": "Brakes",              "dotColor": "#5dba7d", "count": 4 },
+        { "id": "cooling",    "label": "Cooling System",      "dotColor": "#c86e9a", "count": 7 },
+        { "id": "turbo",      "label": "Turbocharger",        "dotColor": "#c8a96e", "count": 1 },
+        { "id": "electrical", "label": "Electrical",          "dotColor": "#e0d055", "count": 2 },
+        { "id": "tires",      "label": "Tires & Alignment",   "dotColor": "#8b8b8b", "count": 5 },
+        { "id": "shops",      "label": "Service Shops",       "dotColor": "#7b68b5" }
+      ],
+      "sectionAlerts": {
+        "cooling": { "icon": "ℹ️", "type": "cooling", "titleClass": "cooling", "title": "Thermostat Replaced Twice in 2024", "body": "Replaced in both March and October 2024 — worth monitoring if cooling issues arise." },
+        "turbo":   { "icon": "⚠️", "type": "",        "titleClass": "danger",  "title": "Turbocharger Replaced — Most Significant Repair on Record", "body": "At 71,774 miles in March 2026, the turbocharger was replaced/repaired and oil line seals were replaced. Performed at European Service Center alongside a full vehicle inspection and oil change." }
+      }
+    },
+
+    "sierra": {
+      "id": "sierra",
+      "make": "GMC",
+      "model": "Sierra 1500",
+      "year": 2019,
+      "color": "Blue / Gray",
+      "accentClass": "sierra",
+      "accentColor": "#5b9bd5",
+      "accentDim": "rgba(91,155,213,0.15)",
+      "headerClass": "sierra-header",
+      "navClass": "sierra-nav",
+      "tabBadgeClass": "vtab-badge-sierra",
+      "odoClass": "sierra",
+      "ownershipStart": "Feb 2023",
+      "firstServiceDate": "Jun 2019",
+      "latestServiceDate": "Feb 2026",
+      "currentOdometer": 86484,
+      "odometerAtAcquisition": 53664,
+      "milesSinceAcquisition": 32820,
+      "stats": [
+        { "number": "38+",   "label": "Service Records" },
+        { "number": "15+",   "label": "Oil Changes" },
+        { "number": "12.8K", "label": "Avg Miles / Year" },
+        { "number": "0",     "label": "Major Repairs" }
+      ],
+      "alert": {
+        "icon": "✅",
+        "type": "info",
+        "titleClass": "info",
+        "title": "Well Maintained — No Major Repairs",
+        "body": "Consistently serviced at Vanguard GMC throughout original ownership, then Christian Brothers after acquisition. Zero major mechanical failures on record."
+      },
+      "ownershipBadgeText": "You've added ~32,820 miles since acquiring in Feb 2023",
+      "mileageRows": [
+        { "label": "Delivery", "pct": 0.01, "value": "~0 mi",     "valueClass": "dim" },
+        { "label": "Acquired", "pct": 62,   "value": "53,664 mi", "valueClass": "dim" },
+        { "label": "Current",  "pct": 100,  "value": "86,484 mi", "valueClass": "sierra" }
+      ],
+      "overviewCards": [
+        { "type": "routine",      "date": "Ongoing · 2019–2026",   "title": "Routine Oil Changes (15+)",                  "shop": "Vanguard GMC → Christian Brothers → Valvoline", "body": "Consistently maintained every 4–6 months throughout ownership." },
+        { "type": "transmission", "date": "Dec 2022 · 53,664 mi",  "title": "Transmission Fluid Flush + Differential Service", "shop": "Vanguard GMC of Carrollton", "body": "Full pre-delivery service including transmission fluid flush, differential fluid flush, and valve lifter replacement.", "odo": "53,664 mi" },
+        { "type": "fuel",         "date": "Jun 2023 · 60,099 mi",  "title": "Spark Plugs + Fuel System Service",           "shop": "Christian Brothers Automotive", "body": "Spark plugs and wires replaced. Fuel system checked, cleaned, and induction system serviced.", "odo": "60,099 mi" },
+        { "type": "routine",      "date": "Jan 2026 · 86,484 mi",  "title": "4 Tires Replaced",                            "shop": "Self-Service (DIY)", "body": "Full set of four tires replaced.", "odo": "86,484 mi" }
+      ],
+      "chartServiceTypes": {
+        "labels": ["2019","2020","2021","2022","2023","2024","2025","2026"],
+        "datasets": [
+          { "label": "Routine/Oil",  "color": "#5b9bd5", "data": [2,3,4,4,5,1,3,2] },
+          { "label": "Brakes",       "color": "#5dba7d", "data": [0,0,0,0,1,0,0,0] },
+          { "label": "Transmission", "color": "#a78bfa", "data": [0,0,0,0,1,0,0,0] },
+          { "label": "Fuel/Engine",  "color": "#fb923c", "data": [0,0,0,0,1,0,0,0] },
+          { "label": "Electrical",   "color": "#e0d055", "data": [0,2,0,0,1,0,0,0] },
+          { "label": "Tires",        "color": "#8b8b8b", "data": [0,1,2,3,2,0,0,1] }
+        ]
+      },
+      "chartMiles": {
+        "labels": ["2019","2020","2021","2022","2023","2024","2025","2026"],
+        "data": [4547,7337,12338,14313,7444,16170,11456,5375],
+        "partialYear": "2026"
+      },
+      "shops": [
+        { "name": "Vanguard GMC of Carrollton",    "visits": 18, "period": "2019–2023", "note": "Primary dealer through original ownership. All warranty and scheduled maintenance." },
+        { "name": "Christian Brothers Automotive", "visits": 12, "period": "2021–2026", "note": "Pre-purchase inspection and primary shop after acquisition. All routine oil changes." },
+        { "name": "Ewing Buick GMC",               "visits": 1,  "period": "Mar 2023",  "note": "Single alignment service at 55,704 mi." },
+        { "name": "Valvoline Instant Oil Change",  "visits": 1,  "period": "Feb 2026",  "note": "Emissions inspection at 85,519 mi." },
+        { "name": "Self / DIY",                    "visits": 2,  "period": "2025–2026", "note": "DIY oil change (Mar 2025) and tire replacement (Jan 2026)." },
+        { "name": "Texas DMV",                     "visits": 4,  "period": "2023–2026", "note": "Annual registration and safety/emissions inspections." }
+      ],
+      "sections": [
+        { "id": "overview",     "label": "Overview",           "dotColor": "#5b9bd5" },
+        { "id": "timeline",     "label": "Full Timeline",      "dotColor": "#5b9bd5", "count": 38 },
+        { "id": "engine",       "label": "Engine & Oil",       "dotColor": "#e08c55", "count": 15 },
+        { "id": "transmission", "label": "Transmission",       "dotColor": "#a78bfa", "count": 3 },
+        { "id": "fuel",         "label": "Fuel & Spark",       "dotColor": "#fb923c", "count": 2 },
+        { "id": "brakes",       "label": "Brakes",             "dotColor": "#5dba7d", "count": 2 },
+        { "id": "tires",        "label": "Tires & Alignment",  "dotColor": "#8b8b8b", "count": 8 },
+        { "id": "electrical",   "label": "Electrical",         "dotColor": "#e0d055", "count": 2 },
+        { "id": "shops",        "label": "Service Shops",      "dotColor": "#7b68b5" }
+      ],
+      "sectionAlerts": {}
+    }
+  },
+
+  "records": [
+    { "vehicle": "cayman", "date": "Jan 2017", "odo": 16,    "title": "Pre-Delivery Inspection",                                    "shop": "Porsche Dallas",             "tags": ["routine"],               "dot": "minor",   "sections": ["timeline"] },
+    { "vehicle": "cayman", "date": "Nov 2017", "odo": 7846,  "title": "Oil and Filter Changed",                                     "shop": "Porsche Dallas",             "tags": ["routine"],               "dot": "minor",   "sections": ["timeline","engine"] },
+    { "vehicle": "cayman", "date": "Mar 2018", "odo": 10817, "title": "4-Wheel Alignment + Tires Replaced",                        "shop": "Porsche Dallas",             "tags": ["tires"],                 "dot": "minor",   "sections": ["timeline","tires"] },
+    { "vehicle": "cayman", "date": "Nov 2018", "odo": null,  "title": "Antifreeze/Coolant Flush + Emissions Inspection",           "shop": "Porsche Dallas",             "tags": ["cooling"],               "dot": "minor",   "sections": ["timeline","cooling"] },
+    { "vehicle": "cayman", "date": "Jan 2019", "odo": 18842, "title": "Coolant Flush + Cooling System Check + Alignment + Tires",  "shop": "Porsche Dallas",             "tags": ["cooling","tires"],      "dot": "default", "sections": ["timeline","cooling","tires"] },
+    { "vehicle": "cayman", "date": "Oct 2019", "odo": 26599, "title": "30,000 Mile Service",                                        "shop": "Porsche Dallas",             "tags": ["routine"],               "dot": "minor",   "sections": ["timeline"] },
+    { "vehicle": "cayman", "date": "Apr 2020", "odo": 31722, "title": "4-Wheel Alignment + Tires Replaced + Wheel Repair",         "shop": "Porsche Dallas",             "tags": ["tires"],                 "dot": "default", "sections": ["timeline","tires"] },
+    { "vehicle": "cayman", "date": "Oct 2020", "odo": 35179, "title": "Oil Change + Emissions Inspection",                         "shop": "Porsche Dallas",             "tags": ["routine"],               "dot": "minor",   "sections": ["timeline","engine"] },
+    { "vehicle": "cayman", "date": "May 2021", "odo": 39663, "title": "Tires Replaced",                                             "shop": "Porsche Dallas",             "tags": ["tires"],                 "dot": "minor",   "sections": ["timeline","tires"] },
+    { "vehicle": "cayman", "date": "Dec 2021", "odo": 44363, "title": "Oil and Filter Changed",                                     "shop": "Porsche Dallas",             "tags": ["routine"],               "dot": "minor",   "sections": ["timeline","engine"] },
+    { "vehicle": "cayman", "date": "Aug 2022", "odo": 49167, "title": "Oil Change + Brake Fluid Flush",                            "shop": "Porsche Dallas",             "tags": ["routine","brake"],      "dot": "minor",   "sections": ["timeline","engine","brakes"] },
+    { "vehicle": "cayman", "date": "Oct 2022", "odo": 50261, "title": "Headlight Bulbs Replaced",                                  "shop": "Porsche Dallas",             "tags": ["electrical"],            "dot": "minor",   "sections": ["timeline","electrical"] },
+    { "vehicle": "cayman", "date": "Sep 2023", "odo": 55798, "title": "Oil and Filter Changed",                                     "shop": "Alternative Automotive",     "tags": ["routine"],               "dot": "minor",   "sections": ["timeline","engine"] },
+    { "vehicle": "cayman", "date": "Nov 2023", "odo": 57181, "title": "Tires Rotated",                                              "shop": "Self Reported",              "tags": ["tires"],                 "dot": "minor",   "sections": ["timeline","tires"] },
+    { "vehicle": "cayman", "date": "Mar 2024", "odo": 59679, "title": "Water Pump + Gasket + Coolant Flush + Belts + Air Filter",  "shop": "European Service Center",    "tags": ["cooling","engine"],     "dot": "major",   "sections": ["timeline","cooling","engine"] },
+    { "vehicle": "cayman", "date": "Apr 2024", "odo": 59837, "title": "Spark Plugs + Thermostat + Coolant Flush + Temp Sensor",    "shop": "European Service Center",    "tags": ["engine","cooling"],     "dot": "default", "sections": ["timeline","engine","cooling"] },
+    { "vehicle": "cayman", "date": "Aug 2024", "odo": 61864, "title": "Battery Replaced · Charging System Checked",                "shop": "European Service Center",    "tags": ["electrical"],            "dot": "default", "sections": ["timeline","electrical"] },
+    { "vehicle": "cayman", "date": "Oct 2024", "odo": 62617, "title": "Thermostat Replaced",                                        "shop": "European Service Center",    "tags": ["cooling"],               "dot": "default", "sections": ["timeline","cooling"] },
+    { "vehicle": "cayman", "date": "Aug 2025", "odo": 66793, "title": "Full Brake Job — Pads, Rotors, Fluid, Sensors",             "shop": "European Service Center",    "tags": ["brake"],                 "dot": "default", "sections": ["timeline","brakes"] },
+    { "vehicle": "cayman", "date": "Nov 2025", "odo": 69069, "title": "Emissions Inspection · Passed",                              "shop": "Texas",                       "tags": ["routine"],               "dot": "minor",   "sections": ["timeline"] },
+    { "vehicle": "cayman", "date": "Mar 2026", "odo": 71774, "title": "Turbocharger Replaced + Oil Line Seals",                    "shop": "European Service Center",    "tags": ["turbo","major"],        "dot": "major",   "sections": ["timeline","engine","turbo"] },
+
+    { "vehicle": "sierra", "date": "Jun 2019", "odo": null,  "title": "Pre-Delivery Inspection",                                    "shop": "Lawrence Hall Chevrolet",    "tags": ["routine"],               "dot": "minor",   "sections": ["timeline"] },
+    { "vehicle": "sierra", "date": "Oct 2019", "odo": null,  "title": "Tonneau Cover Installed",                                    "shop": "Vanguard GMC",               "tags": ["accessories"],           "dot": "minor",   "sections": ["timeline"] },
+    { "vehicle": "sierra", "date": "Nov 2019", "odo": 1018,  "title": "Window Tint Installed",                                      "shop": "Vanguard GMC",               "tags": ["accessories"],           "dot": "minor",   "sections": ["timeline"] },
+    { "vehicle": "sierra", "date": "Jan 2020", "odo": 4547,  "title": "Battery/Charging System Checked",                           "shop": "Vanguard GMC",               "tags": ["electrical"],            "dot": "minor",   "sections": ["timeline","electrical"] },
+    { "vehicle": "sierra", "date": "Feb 2020", "odo": 5863,  "title": "Oil and Filter Changed",                                     "shop": "Vanguard GMC",               "tags": ["routine"],               "dot": "minor",   "sections": ["timeline","engine"] },
+    { "vehicle": "sierra", "date": "Apr 2020", "odo": 8026,  "title": "Body Computer/Module Reprogrammed",                         "shop": "Vanguard GMC",               "tags": ["electrical"],            "dot": "minor",   "sections": ["timeline","electrical"] },
+    { "vehicle": "sierra", "date": "Aug 2020", "odo": 11884, "title": "Oil Change + Tires Rotated",                                "shop": "Vanguard GMC",               "tags": ["routine","tires"],      "dot": "minor",   "sections": ["timeline","engine","tires"] },
+    { "vehicle": "sierra", "date": "Jan 2021", "odo": 17942, "title": "Oil Change + Tires Rotated",                                "shop": "Vanguard GMC",               "tags": ["routine"],               "dot": "minor",   "sections": ["timeline","engine"] },
+    { "vehicle": "sierra", "date": "May 2021", "odo": 23810, "title": "Oil Change + Air Filter + Tires Rotated",                   "shop": "Vanguard GMC",               "tags": ["routine"],               "dot": "minor",   "sections": ["timeline","engine"] },
+    { "vehicle": "sierra", "date": "Sep 2021", "odo": 30222, "title": "Oil Change + Tires Rotated",                                "shop": "Vanguard GMC",               "tags": ["routine","tires"],      "dot": "minor",   "sections": ["timeline","engine","tires"] },
+    { "vehicle": "sierra", "date": "Sep 2021", "odo": 30276, "title": "Safety Inspection",                                          "shop": "Christian Brothers",         "tags": ["inspection"],            "dot": "minor",   "sections": ["timeline"] },
+    { "vehicle": "sierra", "date": "Jan 2022", "odo": 36227, "title": "Oil Change + Tires Rotated + Fluids Checked",               "shop": "Vanguard GMC",               "tags": ["routine"],               "dot": "minor",   "sections": ["timeline","engine"] },
+    { "vehicle": "sierra", "date": "Apr 2022", "odo": 42123, "title": "4 Tires Replaced + 4-Wheel Alignment",                      "shop": "Vanguard GMC",               "tags": ["tires"],                 "dot": "default", "sections": ["timeline","tires"] },
+    { "vehicle": "sierra", "date": "Jun 2022", "odo": 44475, "title": "Oil Change + 4 Tires Balanced",                             "shop": "Vanguard GMC",               "tags": ["routine","tires"],      "dot": "minor",   "sections": ["timeline","engine","tires"] },
+    { "vehicle": "sierra", "date": "Aug 2022", "odo": 48255, "title": "Oil Change + Air Filters + Tires Rotated + Inspection",     "shop": "Vanguard GMC",               "tags": ["routine","tires"],      "dot": "minor",   "sections": ["timeline","engine","tires"] },
+    { "vehicle": "sierra", "date": "Dec 2022", "odo": 53664, "title": "Full Pre-Delivery Service — Transmission, Differential, Lifters", "shop": "Vanguard GMC",          "tags": ["transmission","engine"], "dot": "major",   "sections": ["timeline","engine","transmission"] },
+    { "vehicle": "sierra", "date": "Jan 2023", "odo": 53941, "title": "Pre-Purchase Inspection",                                    "shop": "Christian Brothers",         "tags": ["inspection"],            "dot": "minor",   "sections": ["timeline"] },
+    { "vehicle": "sierra", "date": "Feb 2023", "odo": 54747, "title": "Brake Fluid Flush + Computer Reprogrammed",                 "shop": "Vanguard GMC",               "tags": ["brake","electrical"],   "dot": "default", "sections": ["timeline","brakes","electrical"] },
+    { "vehicle": "sierra", "date": "Mar 2023", "odo": 55704, "title": "2-Wheel Alignment + Inspection",                             "shop": "Ewing Buick GMC",            "tags": ["tires"],                 "dot": "default", "sections": ["timeline","tires"] },
+    { "vehicle": "sierra", "date": "Jun 2023", "odo": 60099, "title": "Spark Plugs + Wires + Fuel System Service + Induction",     "shop": "Christian Brothers",         "tags": ["fuel","engine"],        "dot": "default", "sections": ["timeline","fuel","engine"] },
+    { "vehicle": "sierra", "date": "Jul 2023", "odo": 61246, "title": "Oil Change + Tires Rotated + Recommended Maintenance",      "shop": "Christian Brothers",         "tags": ["routine","tires"],      "dot": "minor",   "sections": ["timeline","engine","tires"] },
+    { "vehicle": "sierra", "date": "Dec 2023", "odo": 65718, "title": "Oil Change + Tires Rotated",                                "shop": "Christian Brothers",         "tags": ["routine","tires"],      "dot": "minor",   "sections": ["timeline","engine","tires"] },
+    { "vehicle": "sierra", "date": "Dec 2023", "odo": 67971, "title": "Oil Change + Tires Rotated",                                "shop": "Christian Brothers",         "tags": ["routine","tires"],      "dot": "minor",   "sections": ["timeline","engine","tires"] },
+    { "vehicle": "sierra", "date": "Jul 2024", "odo": 70111, "title": "Oil and Filter Changed",                                     "shop": "Christian Brothers",         "tags": ["routine"],               "dot": "minor",   "sections": ["timeline","engine"] },
+    { "vehicle": "sierra", "date": "Feb 2025", "odo": 74748, "title": "Oil and Filter Changed",                                     "shop": "Christian Brothers",         "tags": ["routine"],               "dot": "minor",   "sections": ["timeline","engine"] },
+    { "vehicle": "sierra", "date": "Mar 2025", "odo": 75719, "title": "Oil and Filter Changed (DIY)",                              "shop": "Self-Service",               "tags": ["routine"],               "dot": "minor",   "sections": ["timeline","engine"] },
+    { "vehicle": "sierra", "date": "Aug 2025", "odo": 81189, "title": "Oil and Filter Changed",                                     "shop": "Christian Brothers",         "tags": ["routine"],               "dot": "minor",   "sections": ["timeline","engine"] },
+    { "vehicle": "sierra", "date": "Jan 2026", "odo": 86484, "title": "4 Tires Replaced (DIY)",                                    "shop": "Self-Service",               "tags": ["tires"],                 "dot": "default", "sections": ["timeline","tires"] },
+    { "vehicle": "sierra", "date": "Feb 2026", "odo": 85519, "title": "Emissions Inspection + Oil Change",                         "shop": "Valvoline / Christian Brothers", "tags": ["routine"],            "dot": "minor",   "sections": ["timeline","engine"] }
+  ]
+}
