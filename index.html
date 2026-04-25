@@ -8,574 +8,216 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
   :root {
-    --black: #0a0a0a;
-    --dark: #111111;
-    --panel: #161616;
-    --border: #242424;
-    --accent: #c8a96e;
-    --accent-dim: rgba(200,169,110,0.15);
-    --accent-glow: rgba(200,169,110,0.05);
-    --red: #e05555;
-    --green: #5dba7d;
-    --blue: #5b9bd5;
-    --muted: #555;
-    --text: #d8d0c4;
-    --text-dim: #888;
-    --white: #f0ece4;
-    --sierra-accent: #5b9bd5;
-    --sierra-dim: rgba(91,155,213,0.15);
-    --sierra-glow: rgba(91,155,213,0.05);
+    --black:#0a0a0a; --dark:#111111; --panel:#161616; --border:#242424;
+    --accent:#c8a96e; --accent-dim:rgba(200,169,110,0.15); --accent-glow:rgba(200,169,110,0.05);
+    --red:#e05555; --green:#5dba7d; --muted:#555;
+    --text:#d8d0c4; --text-dim:#888; --white:#f0ece4;
+    --sa:#5b9bd5; --sa-dim:rgba(91,155,213,0.15); --sa-glow:rgba(91,155,213,0.05);
   }
-
-  * { margin:0; padding:0; box-sizing:border-box; }
-
-  body {
-    background: var(--black);
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 300;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  body::before {
-    content:'';
-    position:fixed; inset:0;
-    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
-    pointer-events:none; z-index:9999; opacity:0.4;
-  }
-
-  /* ── VEHICLE TABS ── */
-  .vehicle-tabs {
-    display: flex;
-    border-bottom: 1px solid var(--border);
-    background: var(--dark);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-
-  .vtab {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 16px 32px;
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    transition: all 0.2s ease;
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--muted);
-    user-select: none;
-  }
-
-  .vtab:hover { color: var(--text); background: rgba(255,255,255,0.02); }
-
-  .vtab.active-cayman {
-    color: var(--accent);
-    border-bottom-color: var(--accent);
-    background: var(--accent-glow);
-  }
-
-  .vtab.active-sierra {
-    color: var(--sierra-accent);
-    border-bottom-color: var(--sierra-accent);
-    background: var(--sierra-glow);
-  }
-
-  .vtab-badge {
-    font-family: 'DM Mono', monospace;
-    font-size: 9px;
-    padding: 2px 7px;
-    border-radius: 2px;
-    border: 1px solid;
-  }
-
-  .vtab-badge-cayman { color: var(--accent); border-color: rgba(200,169,110,0.3); background: var(--accent-dim); }
-  .vtab-badge-sierra { color: var(--sierra-accent); border-color: rgba(91,155,213,0.3); background: var(--sierra-dim); }
-
-  .garage-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 9px;
-    letter-spacing: 0.3em;
-    color: var(--muted);
-    text-transform: uppercase;
-    padding: 16px 24px;
-    border-right: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-  }
-
-  /* ── VEHICLE PANELS ── */
-  .vehicle-panel { display: none; }
-  .vehicle-panel.active { display: block; }
-
-  /* ── HEADER ── */
-  header {
-    border-bottom: 1px solid var(--border);
-    padding: 40px 64px 36px;
-    position: relative;
-    overflow: hidden;
-  }
-
-  header.sierra-header::after {
-    background: linear-gradient(90deg, transparent, var(--sierra-accent), transparent) !important;
-  }
-
-  header::after {
-    content:'';
-    position:absolute;
-    bottom:0; left:0; right:0;
-    height:1px;
-    background: linear-gradient(90deg, transparent, var(--accent), transparent);
-    opacity:0.4;
-  }
-
-  .header-eyebrow {
-    font-family:'DM Mono',monospace;
-    font-size:10px; letter-spacing:0.3em;
-    color:var(--accent);
-    text-transform:uppercase;
-    margin-bottom:12px;
-  }
-
-  .header-eyebrow.sierra { color: var(--sierra-accent); }
-
-  header h1 {
-    font-family:'Bebas Neue',sans-serif;
-    font-size:clamp(40px,7vw,88px);
-    letter-spacing:0.04em;
-    line-height:0.9;
-    color:var(--white);
-  }
-
-  header h1 span.cayman-accent { color:var(--accent); }
-  header h1 span.sierra-accent { color:var(--sierra-accent); }
-
-  .header-meta {
-    display:flex; gap:40px;
-    margin-top:24px;
-    flex-wrap:wrap;
-  }
-
-  .meta-item { display:flex; flex-direction:column; gap:4px; }
-
-  .meta-label {
-    font-family:'DM Mono',monospace;
-    font-size:9px; letter-spacing:0.25em;
-    color:var(--muted); text-transform:uppercase;
-  }
-
-  .meta-value {
-    font-family:'DM Mono',monospace;
-    font-size:14px; color:var(--text);
-  }
-
-  /* ── STATS BAR ── */
-  .stats-bar {
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    border-bottom:1px solid var(--border);
-  }
-
-  .stat {
-    padding:28px 40px;
-    border-right:1px solid var(--border);
-    transition:background 0.3s ease;
-  }
-
-  .stat:last-child { border-right:none; }
-  .stat:hover { background:var(--accent-glow); }
-  .stat.sierra:hover { background:var(--sierra-glow); }
-
-  .stat-number {
-    font-family:'Bebas Neue',sans-serif;
-    font-size:44px; line-height:1;
-    margin-bottom:6px;
-    color:var(--accent);
-  }
-
-  .stat-number.sierra { color:var(--sierra-accent); }
-
-  .stat-label {
-    font-family:'DM Mono',monospace;
-    font-size:9px; letter-spacing:0.2em;
-    color:var(--text-dim); text-transform:uppercase;
-  }
-
-  /* ── CHARTS BAND ── */
-  .charts-band {
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    border-bottom:1px solid var(--border);
-  }
-
-  .chart-pane {
-    padding:24px 36px 20px;
-    border-right:1px solid var(--border);
-  }
-
-  .chart-pane:last-child { border-right:none; }
-
-  .chart-title {
-    font-family:'DM Mono',monospace;
-    font-size:9px; letter-spacing:0.2em;
-    color:var(--muted); text-transform:uppercase;
-    margin-bottom:14px;
-  }
-
-  .chart-legend {
-    display:flex; flex-wrap:wrap; gap:10px;
-    margin-top:12px; padding-top:12px;
-    border-top:1px solid var(--border);
-  }
-
-  .legend-item {
-    display:flex; align-items:center; gap:6px;
-    font-family:'DM Mono',monospace;
-    font-size:9px; color:var(--text-dim);
-  }
-
-  .legend-dot {
-    width:9px; height:9px;
-    border-radius:2px; flex-shrink:0;
-  }
-
-  /* ── MAIN LAYOUT ── */
-  .main {
-    display:grid;
-    grid-template-columns:260px 1fr;
-    min-height:calc(100vh - 400px);
-  }
-
-  /* ── SIDEBAR ── */
-  .sidebar {
-    border-right:1px solid var(--border);
-    padding:36px 0;
-    position:sticky; top:53px;
-    height:fit-content;
-  }
-
-  .sidebar-title {
-    font-family:'DM Mono',monospace;
-    font-size:9px; letter-spacing:0.25em;
-    color:var(--muted); text-transform:uppercase;
-    padding:0 28px 18px;
-  }
-
-  .nav-item {
-    display:flex; align-items:center; gap:12px;
-    padding:11px 28px; cursor:pointer;
-    transition:all 0.2s ease;
-    border-left:2px solid transparent;
-  }
-
-  .nav-item:hover { background:var(--accent-glow); border-left-color:var(--accent); }
-  .nav-item.active { border-left-color:var(--accent); background:var(--accent-glow); }
-  .nav-item.active .nav-label { color:var(--accent); }
-
-  .nav-item.sierra-nav:hover { background:var(--sierra-glow); border-left-color:var(--sierra-accent); }
-  .nav-item.sierra-nav.active { border-left-color:var(--sierra-accent); background:var(--sierra-glow); }
-  .nav-item.sierra-nav.active .nav-label { color:var(--sierra-accent); }
-
-  .nav-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
-  .nav-label { font-family:'DM Sans',sans-serif; font-size:13px; color:var(--text-dim); transition:color 0.2s; }
-  .nav-count {
-    margin-left:auto;
-    font-family:'DM Mono',monospace; font-size:10px;
-    color:var(--muted); background:var(--panel);
-    border:1px solid var(--border);
-    padding:2px 7px; border-radius:20px;
-  }
-
-  /* ── CONTENT ── */
-  .content { padding:40px 52px; }
-
-  .section { display:none; }
-  .section.visible { display:block; animation:fadeIn 0.25s ease; }
-
-  .section-header {
-    display:flex; align-items:baseline; gap:16px;
-    margin-bottom:32px; padding-bottom:18px;
-    border-bottom:1px solid var(--border);
-  }
-
-  .section-title {
-    font-family:'Bebas Neue',sans-serif;
-    font-size:34px; color:var(--white); letter-spacing:0.05em;
-  }
-
-  .section-subtitle {
-    font-family:'DM Mono',monospace;
-    font-size:11px; color:var(--text-dim); letter-spacing:0.15em;
-  }
-
-  /* ── CARDS ── */
-  .cards-grid {
-    display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
-    gap:14px; margin-bottom:28px;
-  }
-
-  .card {
-    background:var(--panel); border:1px solid var(--border);
-    border-radius:2px; padding:22px;
-    transition:all 0.25s ease;
-    position:relative; overflow:hidden;
-  }
-
-  .card::before {
-    content:''; position:absolute;
-    top:0; left:0; width:3px; height:100%;
-  }
-
-  .card:hover {
-    border-color:var(--accent);
-    transform:translateY(-2px);
-    box-shadow:0 8px 32px rgba(0,0,0,0.4);
-  }
-
-  .card-date { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.15em; color:var(--muted); margin-bottom:8px; text-transform:uppercase; }
-  .card-title { font-size:14px; font-weight:500; color:var(--white); margin-bottom:6px; line-height:1.4; }
-  .card-shop { font-family:'DM Mono',monospace; font-size:10px; color:var(--text-dim); margin-bottom:12px; }
-  .card-odo {
-    display:inline-flex; align-items:center; gap:6px;
-    font-family:'DM Mono',monospace; font-size:11px;
-    color:var(--accent); background:var(--accent-dim);
-    padding:4px 10px; border-radius:2px; margin-top:10px;
-  }
-  .card-odo::before { content:'◈'; font-size:8px; }
-  .card-odo.sierra { color:var(--sierra-accent); background:var(--sierra-dim); }
-
-  .card.routine::before { background:#5b9bd5; }
-  .card.engine::before { background:#e08c55; }
-  .card.brake::before { background:#5dba7d; }
-  .card.cooling::before { background:#c86e9a; }
-  .card.electrical::before { background:#e0d055; }
-  .card.major::before { background:var(--red); }
-  .card.transmission::before { background:#a78bfa; }
-  .card.fuel::before { background:#fb923c; }
-
-  /* ── ALERT ── */
-  .alert-card {
-    background:rgba(224,85,85,0.05);
-    border:1px solid rgba(224,85,85,0.25);
-    border-radius:2px; padding:18px 22px;
-    margin-bottom:14px;
-    display:flex; align-items:flex-start; gap:14px;
-  }
-
-  .alert-icon { font-size:17px; flex-shrink:0; margin-top:2px; }
-  .alert-text h4 { font-size:13px; font-weight:500; color:var(--red); margin-bottom:4px; }
-  .alert-text p { font-size:12px; color:var(--text-dim); line-height:1.6; }
-
-  /* ── TIMELINE ── */
-  .timeline { position:relative; padding-left:30px; }
-
-  .timeline::before {
-    content:''; position:absolute;
-    left:6px; top:0; bottom:0; width:1px;
-    background:linear-gradient(180deg,var(--accent) 0%,var(--border) 40%);
-  }
-
-  .timeline.sierra-tl::before {
-    background:linear-gradient(180deg,var(--sierra-accent) 0%,var(--border) 40%);
-  }
-
-  .timeline-item {
-    position:relative; margin-bottom:24px;
-    animation:fadeLeft 0.4s ease forwards; opacity:0;
-  }
-
-  .timeline-item:nth-child(1){animation-delay:0.04s}
-  .timeline-item:nth-child(2){animation-delay:0.08s}
-  .timeline-item:nth-child(3){animation-delay:0.12s}
-  .timeline-item:nth-child(4){animation-delay:0.16s}
-  .timeline-item:nth-child(5){animation-delay:0.20s}
-  .timeline-item:nth-child(6){animation-delay:0.24s}
-  .timeline-item:nth-child(7){animation-delay:0.28s}
-  .timeline-item:nth-child(8){animation-delay:0.32s}
-  .timeline-item:nth-child(9){animation-delay:0.36s}
-  .timeline-item:nth-child(10){animation-delay:0.40s}
-
-  .timeline-dot {
-    position:absolute; left:-26px; top:4px;
-    width:13px; height:13px; border-radius:50%;
-    border:2px solid var(--black);
-    background:var(--accent);
-    box-shadow:0 0 0 3px var(--accent-dim);
-  }
-
-  .timeline-dot.sierra { background:var(--sierra-accent); box-shadow:0 0 0 3px var(--sierra-dim); }
-  .timeline-dot.major { width:15px;height:15px;left:-27px; box-shadow:0 0 0 4px var(--accent-dim),0 0 12px rgba(200,169,110,0.3); }
-  .timeline-dot.minor { background:var(--panel); border-color:var(--border); box-shadow:none; width:10px;height:10px;left:-24px; }
-
-  .tl-date { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.15em; color:var(--accent); text-transform:uppercase; margin-bottom:5px; }
-  .tl-date.sierra { color:var(--sierra-accent); }
-  .tl-title { font-size:14px; font-weight:500; color:var(--white); margin-bottom:3px; }
-  .tl-meta { font-family:'DM Mono',monospace; font-size:11px; color:var(--text-dim); }
-  .tl-tags { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
-
-  /* Search highlight pulse on timeline item */
-  .timeline-item.search-hit {
-    border-left: 2px solid var(--accent);
-    padding-left: 10px;
-    margin-left: -12px;
-    border-radius: 2px;
-    animation: searchPulse 2s ease forwards;
-  }
-  .timeline-item.search-hit.sierra-hit {
-    border-left-color: var(--sierra-accent);
-    animation: searchPulseSierra 2s ease forwards;
-  }
-  @keyframes searchPulse {
-    0%   { background: rgba(200,169,110,0.18); }
-    60%  { background: rgba(200,169,110,0.10); }
-    100% { background: transparent; }
-  }
-  @keyframes searchPulseSierra {
-    0%   { background: rgba(91,155,213,0.18); }
-    60%  { background: rgba(91,155,213,0.10); }
-    100% { background: transparent; }
-  }
-
-  .tag {
-    font-family:'DM Mono',monospace; font-size:9px;
-    letter-spacing:0.1em; text-transform:uppercase;
-    padding:3px 7px; border-radius:2px; border:1px solid;
-  }
-
-  .tag-engine { color:#e08c55; border-color:rgba(224,140,85,0.3); background:rgba(224,140,85,0.07); }
-  .tag-brake { color:#5dba7d; border-color:rgba(93,186,125,0.3); background:rgba(93,186,125,0.07); }
-  .tag-routine { color:#5b9bd5; border-color:rgba(91,155,213,0.3); background:rgba(91,155,213,0.07); }
-  .tag-cooling { color:#c86e9a; border-color:rgba(200,110,154,0.3); background:rgba(200,110,154,0.07); }
-  .tag-electrical { color:#e0d055; border-color:rgba(224,208,85,0.3); background:rgba(224,208,85,0.07); }
-  .tag-major { color:var(--red); border-color:rgba(224,85,85,0.3); background:rgba(224,85,85,0.07); }
-  .tag-turbo { color:var(--accent); border-color:rgba(200,169,110,0.3); background:rgba(200,169,110,0.07); }
-  .tag-transmission { color:#a78bfa; border-color:rgba(167,139,250,0.3); background:rgba(167,139,250,0.07); }
-  .tag-fuel { color:#fb923c; border-color:rgba(251,146,60,0.3); background:rgba(251,146,60,0.07); }
-  .tag-tires { color:#8b8b8b; border-color:rgba(139,139,139,0.3); background:rgba(139,139,139,0.07); }
-
-  /* dot colors */
-  .dot-routine { background:#5b9bd5; }
-  .dot-engine { background:#e08c55; }
-  .dot-brake { background:#5dba7d; }
-  .dot-cooling { background:#c86e9a; }
-  .dot-electrical { background:#e0d055; }
-  .dot-major { background:var(--red); }
-  .dot-turbo { background:var(--accent); }
-  .dot-transmission { background:#a78bfa; }
-  .dot-fuel { background:#fb923c; }
-
-  /* mileage bars */
-  .mileage-section { margin-bottom:36px; }
-  .mile-label { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.2em; color:var(--text-dim); text-transform:uppercase; margin-bottom:20px; }
-  .mile-track { position:relative; height:4px; background:var(--border); border-radius:2px; margin-bottom:8px; }
-  .mile-fill { height:100%; border-radius:2px; background:linear-gradient(90deg,#5b9bd5,var(--accent)); }
-  .mile-fill.sierra { background:linear-gradient(90deg,#2563a8,var(--sierra-accent)); }
-  .ownership-badge {
-    display:inline-flex; align-items:center; gap:8px;
-    background:var(--panel); border:1px solid var(--border);
-    padding:9px 14px; border-radius:2px; margin-top:16px;
-    font-family:'DM Mono',monospace; font-size:11px; color:var(--text-dim);
-  }
-  .ownership-badge span { color:var(--accent); }
-  .ownership-badge span.sierra { color:var(--sierra-accent); }
-
-  /* shop table */
-  .shop-table { width:100%; border-collapse:collapse; }
-  .shop-table th { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.2em; color:var(--muted); text-transform:uppercase; text-align:left; padding:10px 14px; border-bottom:1px solid var(--border); }
-  .shop-table td { font-size:13px; padding:13px 14px; border-bottom:1px solid rgba(36,36,36,0.5); vertical-align:top; }
-  .shop-table tr:last-child td { border-bottom:none; }
-  .shop-table tr:hover td { background:var(--accent-glow); }
-  .shop-name { font-weight:500; color:var(--white); font-size:13px; }
-  .shop-visits { font-family:'DM Mono',monospace; font-size:20px; color:var(--accent); }
-  .shop-visits.sierra { color:var(--sierra-accent); }
-  .shop-era { font-family:'DM Mono',monospace; font-size:11px; color:var(--text-dim); }
-
-  @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
-  @keyframes fadeIn { from{opacity:0} to{opacity:1} }
-  @keyframes fadeLeft { from{opacity:0;transform:translateX(-10px)} to{opacity:1;transform:translateX(0)} }
-
-  /* ── SEARCH ── */
-  .search-wrap {
-    margin-left: auto;
-    display: flex;
-    align-items: center;
-    padding: 0 20px;
-    border-left: 1px solid var(--border);
-  }
-  .search-input-wrap { position: relative; display: flex; align-items: center; }
-  .search-icon { position:absolute; left:10px; color:var(--muted); font-size:13px; pointer-events:none; }
-  #search-input {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 2px;
-    padding: 7px 28px 7px 30px;
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    color: var(--text);
-    width: 210px;
-    outline: none;
-    transition: border-color 0.2s, width 0.3s ease;
-  }
-  #search-input::placeholder { color: var(--muted); }
-  #search-input:focus { border-color: var(--accent); width: 270px; }
-  .search-clear {
-    position: absolute; right: 8px;
-    cursor: pointer; color: var(--muted);
-    font-size: 15px; display: none; line-height: 1;
-    transition: color 0.2s;
-  }
-  .search-clear:hover { color: var(--text); }
-
-  /* Search results panel */
-  #search-results {
-    display: none;
-    position: absolute;
-    top: 53px; left: 0; right: 0;
-    background: var(--dark);
-    border-bottom: 2px solid var(--border);
-    z-index: 98;
-    max-height: 72vh;
-    overflow-y: auto;
-    animation: fadeIn 0.15s ease;
-  }
-  .sr-header {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 12px 32px;
-    border-bottom: 1px solid var(--border);
-    font-family: 'DM Mono', monospace;
-    font-size: 9px; letter-spacing: 0.2em;
-    color: var(--muted); text-transform: uppercase;
-    position: sticky; top: 0; background: var(--dark); z-index: 1;
-  }
-  .sr-count { color: var(--accent); }
-  .sr-item {
-    display: flex; align-items: flex-start; gap: 14px;
-    padding: 13px 32px;
-    border-bottom: 1px solid rgba(36,36,36,0.6);
-    cursor: pointer;
-    transition: background 0.12s;
-  }
-  .sr-item:hover { background: var(--panel); }
-  .sr-item:last-child { border-bottom: none; }
-  .sr-badge {
-    font-family: 'DM Mono', monospace; font-size: 9px;
-    letter-spacing: 0.1em; text-transform: uppercase;
-    padding: 3px 8px; border-radius: 2px; border: 1px solid;
-    flex-shrink: 0; margin-top: 2px; white-space: nowrap;
-  }
-  .sr-badge.cayman { color:var(--accent); border-color:rgba(200,169,110,0.35); background:var(--accent-dim); }
-  .sr-badge.sierra { color:var(--sierra-accent); border-color:rgba(91,155,213,0.35); background:var(--sierra-dim); }
-  .sr-body { flex: 1; min-width: 0; }
-  .sr-title { font-size: 13px; font-weight: 500; color: var(--white); margin-bottom: 3px; line-height: 1.4; }
-  .sr-title mark { background:rgba(200,169,110,0.2); color:var(--accent); border-radius:2px; padding:0 2px; }
-  .sr-meta { font-family:'DM Mono',monospace; font-size:10px; color:var(--text-dim); }
-  .sr-tags { display:flex; flex-wrap:wrap; gap:5px; margin-top:6px; }
-  .sr-empty { padding:48px 32px; text-align:center; font-family:'DM Mono',monospace; font-size:11px; color:var(--muted); letter-spacing:0.1em; }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden;}
+  body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:0.4;}
+
+  /* TABS */
+  .vehicle-tabs{display:flex;border-bottom:1px solid var(--border);background:var(--dark);position:sticky;top:0;z-index:100;}
+  .vtab{display:flex;align-items:center;gap:12px;padding:16px 32px;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);user-select:none;}
+  .vtab:hover{color:var(--text);background:rgba(255,255,255,.02);}
+  .vtab.active-cayman{color:var(--accent);border-bottom-color:var(--accent);background:var(--accent-glow);}
+  .vtab.active-sierra{color:var(--sa);border-bottom-color:var(--sa);background:var(--sa-glow);}
+  .vtab-badge{font-family:'DM Mono',monospace;font-size:9px;padding:2px 7px;border-radius:2px;border:1px solid;}
+  .vtab-badge-cayman{color:var(--accent);border-color:rgba(200,169,110,.3);background:var(--accent-dim);}
+  .vtab-badge-sierra{color:var(--sa);border-color:rgba(91,155,213,.3);background:var(--sa-dim);}
+  .garage-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.3em;color:var(--muted);text-transform:uppercase;padding:16px 24px;border-right:1px solid var(--border);display:flex;align-items:center;}
+
+  /* PANELS */
+  .vehicle-panel{display:none;} .vehicle-panel.active{display:block;}
+
+  /* HEADER */
+  header{border-bottom:1px solid var(--border);padding:40px 64px 36px;position:relative;overflow:hidden;}
+  header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:.4;}
+  header.sh::after{background:linear-gradient(90deg,transparent,var(--sa),transparent)!important;}
+  .h-eye{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.3em;color:var(--accent);text-transform:uppercase;margin-bottom:12px;}
+  .h-eye.s{color:var(--sa);}
+  header h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,7vw,88px);letter-spacing:.04em;line-height:.9;color:var(--white);}
+  .ca{color:var(--accent);} .sia{color:var(--sa);}
+  .h-meta{display:flex;gap:40px;margin-top:24px;flex-wrap:wrap;}
+  .mi{display:flex;flex-direction:column;gap:4px;}
+  .ml{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.25em;color:var(--muted);text-transform:uppercase;}
+  .mv{font-family:'DM Mono',monospace;font-size:14px;color:var(--text);}
+
+  /* STATS */
+  .stats-bar{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--border);}
+  .stat{padding:28px 40px;border-right:1px solid var(--border);transition:background .3s;}
+  .stat:last-child{border-right:none;}
+  .stat:hover{background:var(--accent-glow);}
+  .stat.s:hover{background:var(--sa-glow);}
+  .sn{font-family:'Bebas Neue',sans-serif;font-size:44px;line-height:1;margin-bottom:6px;color:var(--accent);}
+  .sn.s{color:var(--sa);}
+  .sl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.2em;color:var(--text-dim);text-transform:uppercase;}
+
+  /* CHARTS */
+  .charts-band{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border);}
+  .chart-pane{padding:24px 36px 20px;border-right:1px solid var(--border);}
+  .chart-pane:last-child{border-right:none;}
+  .ct{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;margin-bottom:14px;}
+  .cleg{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);}
+  .cli{display:flex;align-items:center;gap:6px;font-family:'DM Mono',monospace;font-size:9px;color:var(--text-dim);}
+  .cld{width:9px;height:9px;border-radius:2px;flex-shrink:0;}
+
+  /* LAYOUT */
+  .main{display:grid;grid-template-columns:240px 1fr;min-height:calc(100vh - 400px);}
+  .sidebar{border-right:1px solid var(--border);padding:36px 0;position:sticky;top:53px;height:fit-content;}
+  .sidebar-title{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.25em;color:var(--muted);text-transform:uppercase;padding:0 28px 18px;}
+  .nav-item{display:flex;align-items:center;gap:12px;padding:11px 28px;cursor:pointer;transition:all .2s;border-left:2px solid transparent;}
+  .nav-item:hover{background:var(--accent-glow);border-left-color:var(--accent);}
+  .nav-item.active{border-left-color:var(--accent);background:var(--accent-glow);}
+  .nav-item.active .nl{color:var(--accent);}
+  .nav-item.sn-nav:hover{background:var(--sa-glow);border-left-color:var(--sa);}
+  .nav-item.sn-nav.active{border-left-color:var(--sa);background:var(--sa-glow);}
+  .nav-item.sn-nav.active .nl{color:var(--sa);}
+  .ndot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+  .nl{font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text-dim);transition:color .2s;}
+  .nc{margin-left:auto;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);background:var(--panel);border:1px solid var(--border);padding:2px 7px;border-radius:20px;}
+  .content{padding:40px 52px;}
+  .section{display:none;} .section.visible{display:block;animation:fadeIn .25s ease;}
+  .sec-hdr{display:flex;align-items:baseline;gap:16px;margin-bottom:32px;padding-bottom:18px;border-bottom:1px solid var(--border);}
+  .sec-title{font-family:'Bebas Neue',sans-serif;font-size:34px;color:var(--white);letter-spacing:.05em;}
+  .sec-sub{font-family:'DM Mono',monospace;font-size:11px;color:var(--text-dim);letter-spacing:.15em;}
+
+  /* CARDS */
+  .cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px;margin-bottom:28px;}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:2px;padding:22px;transition:all .25s;position:relative;overflow:hidden;}
+  .card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;}
+  .card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.4);}
+  .cd{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.15em;color:var(--muted);margin-bottom:8px;text-transform:uppercase;}
+  .ct2{font-size:14px;font-weight:500;color:var(--white);margin-bottom:6px;line-height:1.4;}
+  .csh{font-family:'DM Mono',monospace;font-size:10px;color:var(--text-dim);margin-bottom:4px;}
+  .codo{display:inline-flex;align-items:center;gap:6px;font-family:'DM Mono',monospace;font-size:11px;color:var(--accent);background:var(--accent-dim);padding:4px 10px;border-radius:2px;margin-top:8px;}
+  .codo::before{content:'◈';font-size:8px;}
+  .codo.s{color:var(--sa);background:var(--sa-dim);}
+
+  /* card left-border colors by tag */
+  .card.routine::before{background:#5b9bd5;} .card.engine::before{background:#e08c55;}
+  .card.brake::before{background:#5dba7d;}   .card.cooling::before{background:#c86e9a;}
+  .card.electrical::before{background:#e0d055;} .card.major::before{background:var(--red);}
+  .card.transmission::before{background:#a78bfa;} .card.fuel::before{background:#fb923c;}
+  .card.turbo::before{background:var(--accent);} .card.tires::before{background:#8b8b8b;}
+
+  /* ALERT */
+  .alert-card{border-radius:2px;padding:18px 22px;margin-bottom:14px;display:flex;align-items:flex-start;gap:14px;background:rgba(224,85,85,.05);border:1px solid rgba(224,85,85,.25);}
+  .ai{font-size:17px;flex-shrink:0;margin-top:2px;}
+  .at h4{font-size:13px;font-weight:500;margin-bottom:4px;}
+  .at p{font-size:12px;color:var(--text-dim);line-height:1.6;}
+
+  /* TIMELINE */
+  .timeline{position:relative;padding-left:30px;}
+  .timeline::before{content:'';position:absolute;left:6px;top:0;bottom:0;width:1px;background:linear-gradient(180deg,var(--accent) 0%,var(--border) 40%);}
+  .timeline.stl::before{background:linear-gradient(180deg,var(--sa) 0%,var(--border) 40%);}
+  .tli{position:relative;margin-bottom:24px;animation:fadeLeft .4s ease forwards;opacity:0;}
+  .tli:nth-child(1){animation-delay:.04s} .tli:nth-child(2){animation-delay:.08s}
+  .tli:nth-child(3){animation-delay:.12s} .tli:nth-child(4){animation-delay:.16s}
+  .tli:nth-child(5){animation-delay:.20s} .tli:nth-child(6){animation-delay:.24s}
+  .tli:nth-child(7){animation-delay:.28s} .tli:nth-child(8){animation-delay:.32s}
+  .tli:nth-child(9){animation-delay:.36s} .tli:nth-child(10){animation-delay:.40s}
+  .tdot{position:absolute;left:-26px;top:4px;width:13px;height:13px;border-radius:50%;border:2px solid var(--black);background:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);}
+  .tdot.s{background:var(--sa);box-shadow:0 0 0 3px var(--sa-dim);}
+  .tdot.major{width:15px;height:15px;left:-27px;box-shadow:0 0 0 4px var(--accent-dim),0 0 12px rgba(200,169,110,.3);}
+  .tdot.minor{background:var(--panel);border-color:var(--border);box-shadow:none;width:10px;height:10px;left:-24px;}
+  .td{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.15em;color:var(--accent);text-transform:uppercase;margin-bottom:5px;}
+  .td.s{color:var(--sa);}
+  .tt{font-size:14px;font-weight:500;color:var(--white);margin-bottom:3px;}
+  .tm{font-family:'DM Mono',monospace;font-size:11px;color:var(--text-dim);}
+  .ttags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+
+  /* search hit pulse */
+  .tli.hit{border-left:2px solid var(--accent);padding-left:10px;margin-left:-12px;border-radius:2px;animation:sPulse 2s ease forwards;}
+  .tli.hit.shits{border-left-color:var(--sa);animation:sPulseS 2s ease forwards;}
+  @keyframes sPulse{0%{background:rgba(200,169,110,.18)}60%{background:rgba(200,169,110,.10)}100%{background:transparent}}
+  @keyframes sPulseS{0%{background:rgba(91,155,213,.18)}60%{background:rgba(91,155,213,.10)}100%{background:transparent}}
+
+  /* TAGS — single unified palette, used everywhere */
+  .tag{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:3px 7px;border-radius:2px;border:1px solid;}
+  .tag-routine{color:#5b9bd5;border-color:rgba(91,155,213,.3);background:rgba(91,155,213,.07);}
+  .tag-engine{color:#e08c55;border-color:rgba(224,140,85,.3);background:rgba(224,140,85,.07);}
+  .tag-brake{color:#5dba7d;border-color:rgba(93,186,125,.3);background:rgba(93,186,125,.07);}
+  .tag-cooling{color:#c86e9a;border-color:rgba(200,110,154,.3);background:rgba(200,110,154,.07);}
+  .tag-electrical{color:#e0d055;border-color:rgba(224,208,85,.3);background:rgba(224,208,85,.07);}
+  .tag-turbo{color:#c8a96e;border-color:rgba(200,169,110,.3);background:rgba(200,169,110,.07);}
+  .tag-transmission{color:#a78bfa;border-color:rgba(167,139,250,.3);background:rgba(167,139,250,.07);}
+  .tag-fuel{color:#fb923c;border-color:rgba(251,146,60,.3);background:rgba(251,146,60,.07);}
+  .tag-tires{color:#8b8b8b;border-color:rgba(139,139,139,.3);background:rgba(139,139,139,.07);}
+  .tag-major{color:var(--red);border-color:rgba(224,85,85,.3);background:rgba(224,85,85,.07);}
+
+  /* MILEAGE BARS */
+  .mile-wrap{margin:28px 0 36px;}
+  .mile-lbl{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.2em;color:var(--text-dim);text-transform:uppercase;margin-bottom:20px;}
+  .mile-row{display:flex;align-items:center;gap:12px;margin-bottom:8px;}
+  .mile-key{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);width:72px;}
+  .mile-track{flex:1;height:4px;background:var(--border);border-radius:2px;}
+  .mile-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,#5b9bd5,var(--accent));}
+  .mile-fill.s{background:linear-gradient(90deg,#2563a8,var(--sa));}
+  .mile-val{font-family:'DM Mono',monospace;font-size:11px;width:58px;text-align:right;}
+  .own-badge{display:inline-flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--border);padding:9px 14px;border-radius:2px;margin-top:16px;font-family:'DM Mono',monospace;font-size:11px;color:var(--text-dim);}
+
+  /* SHOP TABLE */
+  .shop-table{width:100%;border-collapse:collapse;}
+  .shop-table th{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;text-align:left;padding:10px 14px;border-bottom:1px solid var(--border);}
+  .shop-table td{font-size:13px;padding:13px 14px;border-bottom:1px solid rgba(36,36,36,.5);vertical-align:top;}
+  .shop-table tr:last-child td{border-bottom:none;}
+  .shop-table tr:hover td{background:var(--accent-glow);}
+  .shn{font-weight:500;color:var(--white);font-size:13px;}
+  .shv{font-family:'DM Mono',monospace;font-size:20px;color:var(--accent);}
+  .shv.s{color:var(--sa);}
+  .she{font-family:'DM Mono',monospace;font-size:11px;color:var(--text-dim);}
+
+  /* MAINTENANCE SCHEDULE */
+  .maint-intro{font-size:13px;color:var(--text-dim);line-height:1.7;margin-bottom:28px;max-width:680px;}
+  .maint-band{display:flex;flex-direction:column;gap:0;border:1px solid var(--border);border-radius:2px;overflow:hidden;margin-bottom:24px;}
+  .maint-row{display:grid;grid-template-columns:130px 1fr 160px;border-bottom:1px solid var(--border);transition:background .15s;}
+  .maint-row:last-child{border-bottom:none;}
+  .maint-row:hover{background:var(--panel);}
+  .maint-row.header-row{background:var(--panel);}
+  .maint-cell{padding:13px 18px;font-size:13px;}
+  .maint-cell.mhdr{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;padding:10px 18px;}
+  .maint-mi{font-family:'DM Mono',monospace;font-size:12px;color:var(--accent);font-weight:500;}
+  .maint-mi.s{color:var(--sa);}
+  .maint-item{color:var(--white);font-size:13px;line-height:1.5;}
+  .maint-status{font-family:'DM Mono',monospace;font-size:10px;padding:4px 9px;border-radius:2px;border:1px solid;display:inline-block;white-space:nowrap;}
+  .maint-status.due{color:var(--red);border-color:rgba(224,85,85,.35);background:rgba(224,85,85,.08);}
+  .maint-status.upcoming{color:#e08c55;border-color:rgba(224,140,85,.35);background:rgba(224,140,85,.08);}
+  .maint-status.ok{color:var(--green);border-color:rgba(93,186,125,.35);background:rgba(93,186,125,.08);}
+  .maint-status.na{color:var(--muted);border-color:rgba(85,85,85,.3);background:rgba(85,85,85,.06);}
+  .maint-note{font-size:12px;color:var(--text-dim);margin-top:3px;line-height:1.5;}
+  .maint-section-lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.25em;color:var(--muted);text-transform:uppercase;margin:28px 0 10px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+
+  /* SEARCH */
+  .search-wrap{margin-left:auto;display:flex;align-items:center;padding:0 20px;border-left:1px solid var(--border);}
+  .siw{position:relative;display:flex;align-items:center;}
+  .sic{position:absolute;left:10px;color:var(--muted);font-size:13px;pointer-events:none;}
+  #search-input{background:var(--panel);border:1px solid var(--border);border-radius:2px;padding:7px 28px 7px 30px;font-family:'DM Mono',monospace;font-size:11px;color:var(--text);width:210px;outline:none;transition:border-color .2s,width .3s;}
+  #search-input::placeholder{color:var(--muted);}
+  #search-input:focus{border-color:var(--accent);width:270px;}
+  .scl{position:absolute;right:8px;cursor:pointer;color:var(--muted);font-size:15px;display:none;line-height:1;transition:color .2s;}
+  .scl:hover{color:var(--text);}
+  #search-results{display:none;position:absolute;top:53px;left:0;right:0;background:var(--dark);border-bottom:2px solid var(--border);z-index:98;max-height:72vh;overflow-y:auto;animation:fadeIn .15s ease;}
+  .srh{display:flex;justify-content:space-between;align-items:center;padding:12px 32px;border-bottom:1px solid var(--border);font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;position:sticky;top:0;background:var(--dark);z-index:1;}
+  .src{color:var(--accent);}
+  .sri{display:flex;align-items:flex-start;gap:14px;padding:13px 32px;border-bottom:1px solid rgba(36,36,36,.6);cursor:pointer;transition:background .12s;}
+  .sri:hover{background:var(--panel);}
+  .sri:last-child{border-bottom:none;}
+  .srb{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:2px;border:1px solid;flex-shrink:0;margin-top:2px;white-space:nowrap;}
+  .srb.cayman{color:var(--accent);border-color:rgba(200,169,110,.35);background:var(--accent-dim);}
+  .srb.sierra{color:var(--sa);border-color:rgba(91,155,213,.35);background:var(--sa-dim);}
+  .srbody{flex:1;min-width:0;}
+  .srtitle{font-size:13px;font-weight:500;color:var(--white);margin-bottom:3px;line-height:1.4;}
+  .srtitle mark{background:rgba(200,169,110,.2);color:var(--accent);border-radius:2px;padding:0 2px;}
+  .srmeta{font-family:'DM Mono',monospace;font-size:10px;color:var(--text-dim);}
+  .srtags{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;}
+  .srempty{padding:48px 32px;text-align:center;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:.1em;}
+
+  @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  @keyframes fadeLeft{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:translateX(0)}}
 
   @media(max-width:900px){
     header{padding:28px 24px;}
@@ -585,872 +227,764 @@
     .main{grid-template-columns:1fr;}
     .sidebar{position:static;border-right:none;border-bottom:1px solid var(--border);padding:20px 0;}
     .content{padding:28px 20px;}
-    .header-meta{flex-wrap:wrap;gap:18px;}
     .vehicle-tabs{flex-wrap:wrap;}
     .garage-label{display:none;}
     .search-wrap{padding:10px 16px;border-left:none;border-top:1px solid var(--border);width:100%;}
-    #search-input{width:100%;}
-    #search-input:focus{width:100%;}
+    #search-input,#search-input:focus{width:100%;}
+    .maint-row{grid-template-columns:100px 1fr 120px;}
   }
 </style>
 </head>
 <body>
-
 <script>
-// ═══════════════════════════════════════════════════════════════════
-//  GARAGE DATA — Edit all vehicle info, stats, records, and charts
-//  here. The page renders entirely from this config object.
-// ═══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+//  UNIFIED TAG TAXONOMY — MECE, used identically everywhere:
+//  cards, timeline dots, nav badges, search, chart legend
+//
+//  routine      — oil changes, inspections, general maintenance
+//  engine       — engine mechanical work (belts, pumps, plugs)
+//  brake        — brakes, rotors, brake fluid
+//  cooling      — coolant, thermostat, water pump, radiator
+//  turbo        — turbocharger and boost-related
+//  electrical   — battery, lighting, modules, sensors
+//  transmission — transmission, differential, transfer case
+//  fuel         — fuel system, injectors, spark (where fuel-focused)
+//  tires        — tires, wheels, alignment, rotation
+//
+//  'major' is a DOT STYLE only (not a filter tag) — applied to
+//  significant repairs to make them visually prominent in the timeline.
+// ═══════════════════════════════════════════════════════════════
+
 const GARAGE = {
 
   // ─────────────────────────────────────────
-  //  VEHICLE 1: PORSCHE 718 CAYMAN
+  //  PORSCHE 718 CAYMAN
   // ─────────────────────────────────────────
   cayman: {
     meta: {
-      eyebrow: 'Vehicle Service History',
-      make: 'Porsche',
-      model: '718 Cayman',
-      subtitle: 'Maintenance Log',
-      firstService: 'Jan 2017',
-      latestService: 'Mar 2026',
-      odometer: '71,774 mi',
-      color: 'Black',
-      ownedSince: 'Dec 2023',
+      eyebrow:'Vehicle Service History', make:'Porsche', model:'718 Cayman',
+      subtitle:'Maintenance Log', firstService:'Jan 2017', latestService:'Mar 2026',
+      odometer:'71,774 mi', color:'Black', ownedSince:'Dec 2023',
     },
-
-    stats: [
-      { number: '35+', label: 'Service Records' },
-      { number: '9',   label: 'Oil Changes' },
-      { number: '7.7K',label: 'Avg Miles / Year' },
-      { number: '1',   label: 'Major Repairs' },
+    stats:[
+      {number:'21',  label:'Service Records'},
+      {number:'8',   label:'Oil Changes'},
+      {number:'7.7K',label:'Avg Miles / Year'},
+      {number:'1',   label:'Major Repairs'},
     ],
-
-    // Miles driven per year — used for the bar chart
-    // Last entry is partial-year; label it accordingly
-    milesPerYear: {
-      labels: ['2017','2018','2019','2020','2021','2022','2023','2024','2025','2026'],
-      data:   [7830,  9200,  9700,  8500,  9200,  5900,  7000,  5970,  5890,  2705],
-      partialYearIndex: 9, // index of the partial year (2026)
+    milesPerYear:{
+      labels:['2017','2018','2019','2020','2021','2022','2023','2024','2025','2026'],
+      data:  [7830,  9200,  9700,  8500,  9200,  5900,  7000,  5970,  5890,  2705],
+      partial:9,
     },
-
-    // Service event counts per year, per type — used for stacked bar chart
-    serviceChart: {
-      labels: ['2017','2018','2019','2020','2021','2022','2023','2024','2025','2026'],
-      datasets: [
-        { label:'Routine/Oil',  color:'#5b9bd5', data:[2,1,2,2,3,2,2,1,0,1] },
-        { label:'Brakes',       color:'#5dba7d', data:[0,0,0,0,0,1,0,0,1,0] },
-        { label:'Cooling',      color:'#c86e9a', data:[0,1,1,0,0,0,0,2,0,0] },
-        { label:'Engine/Belts', color:'#e08c55', data:[0,0,0,0,0,0,0,1,0,0] },
-        { label:'Electrical',   color:'#e0d055', data:[0,0,0,0,0,1,0,1,0,0] },
-        { label:'Tires',        color:'#8b8b8b', data:[0,1,1,1,1,0,1,0,0,0] },
-        { label:'Turbo/Major',  color:'#c8a96e', data:[0,0,0,0,0,0,0,0,0,1] },
+    serviceChart:{
+      labels:['2017','2018','2019','2020','2021','2022','2023','2024','2025','2026'],
+      datasets:[
+        {label:'Oil & Routine', color:'#5b9bd5', data:[2,1,2,2,3,2,2,1,0,1]},
+        {label:'Brakes',        color:'#5dba7d', data:[0,0,0,0,0,1,0,0,1,0]},
+        {label:'Cooling',       color:'#c86e9a', data:[0,1,1,0,0,0,0,2,0,0]},
+        {label:'Engine',        color:'#e08c55', data:[0,0,0,0,0,0,0,1,0,0]},
+        {label:'Electrical',    color:'#e0d055', data:[0,0,0,0,0,1,0,1,0,0]},
+        {label:'Tires',         color:'#8b8b8b', data:[0,1,1,1,1,0,1,0,0,0]},
+        {label:'Turbo',         color:'#c8a96e', data:[0,0,0,0,0,0,0,0,0,1]},
       ],
-      legend: ['Routine/Oil','Brakes','Cooling','Engine/Belts','Electrical','Tires','Turbo/Major'],
+      legend:['Oil & Routine','Brakes','Cooling','Engine','Electrical','Tires','Turbo'],
     },
-
-    // Mileage progress bars shown in the Overview section
-    mileageProgress: [
-      { label: 'Delivery',  width: '0.02%', value: '16 mi',     accent: false },
-      { label: 'Acquired',  width: '77%',   value: '57,181 mi', accent: false },
-      { label: 'Current',   width: '100%',  value: '71,774 mi', accent: true  },
+    mileageProgress:[
+      {label:'Delivery', width:'0.02%', value:'16 mi',     hi:false},
+      {label:'Acquired', width:'77%',   value:'57,181 mi', hi:false},
+      {label:'Current',  width:'100%',  value:'71,774 mi', hi:true },
     ],
-    ownershipNote: "You've added ~14,593 miles since acquiring in Dec 2023",
-
-    // Alert banners shown in sections (optional)
-    alerts: {
-      overview: {
-        icon: '⚠️',
-        title: 'Major Repair — March 2026',
-        body: 'Turbocharger replaced/repaired + oil line seal(s) replaced at 71,774 mi. Most significant repair in the vehicle\'s service history. Performed at European Service Center.',
-      },
-      cooling: {
-        style: 'info', // 'info' renders in the sierra-accent palette
-        icon: 'ℹ️',
-        title: 'Thermostat Replaced Twice in 2024',
-        body: 'Replaced in both March and October 2024 — worth monitoring if cooling issues arise.',
-      },
+    ownershipNote:"~14,593 miles added since acquiring in Dec 2023",
+    alerts:{
+      overview:{icon:'⚠️',style:'warn',
+        title:'Major Repair — March 2026',
+        body:"Turbocharger replaced + oil line seal(s) at 71,774 mi. Most significant repair in the vehicle's history. Performed at European Service Center."},
+      cooling:{icon:'ℹ️',style:'info',
+        title:'Thermostat Replaced Twice in 2024',
+        body:'Replaced in both March and October 2024 — worth monitoring for recurring cooling issues.'},
     },
-
-    // Nav sections: id, label, dot color class, count ('' = no badge)
-    navSections: [
-      { id:'overview',    label:'Overview',          dot:'dot-routine',   count:'' },
-      { id:'timeline',    label:'Full Timeline',     dot:'accent',        count:'35' },
-      { id:'engine',      label:'Engine & Drivetrain',dot:'dot-engine',   count:'6' },
-      { id:'brakes',      label:'Brakes',            dot:'dot-brake',     count:'4' },
-      { id:'cooling',     label:'Cooling System',    dot:'dot-cooling',   count:'7' },
-      { id:'turbo',       label:'Turbocharger',      dot:'dot-turbo',     count:'1' },
-      { id:'electrical',  label:'Electrical',        dot:'dot-electrical',count:'2' },
-      { id:'tires',       label:'Tires & Alignment', dot:'grey',          count:'5' },
-      { id:'shops',       label:'Service Shops',     dot:'purple',        count:'' },
+    // navSections: filterTags drives exactly which timeline records appear.
+    // Each tag key must exist in TAG_STYLES. Sections with no filterTags
+    // (overview, timeline, schedule, shops) are rendered by special-case logic.
+    navSections:[
+      {id:'overview',  label:'Overview',         dot:'#5b9bd5', count:''},
+      {id:'timeline',  label:'Full Timeline',    dot:'#c8a96e', count:'21'},
+      {id:'schedule',  label:'Maint. Schedule',  dot:'#5dba7d', count:''},
+      {id:'routine',   label:'Oil & Routine',    dot:'#5b9bd5', count:'8',  filterTags:['routine']},
+      {id:'engine',    label:'Engine',           dot:'#e08c55', count:'2',  filterTags:['engine']},
+      {id:'brakes',    label:'Brakes',           dot:'#5dba7d', count:'2',  filterTags:['brake']},
+      {id:'cooling',   label:'Cooling',          dot:'#c86e9a', count:'5',  filterTags:['cooling']},
+      {id:'turbo',     label:'Turbocharger',     dot:'#c8a96e', count:'1',  filterTags:['turbo']},
+      {id:'electrical',label:'Electrical',       dot:'#e0d055', count:'2',  filterTags:['electrical']},
+      {id:'tires',     label:'Tires & Alignment',dot:'#8b8b8b', count:'5',  filterTags:['tires']},
+      {id:'shops',     label:'Service Shops',    dot:'#7b68b5', count:''},
     ],
-
-    // ── SERVICE RECORDS ──────────────────────────────────────────
-    // dot: 'major' | 'minor' | 'sierra' | '' (default accent)
-    // tags: array of tag keys (see TAG_STYLES below)
-    timeline: [
-      { dot:'major', date:'Mar 2026 · 71,774 mi', title:'Turbocharger Replaced + Oil Line Seals',           shop:'European Service Center',  tags:['turbo','major'] },
-      { dot:'',      date:'Aug 2025 · 66,793 mi', title:'Full Brake Job — Pads, Rotors, Fluid, Sensors',    shop:'European Service Center',  tags:['brake'] },
-      { dot:'minor', date:'Nov 2025 · 69,069 mi', title:'Emissions Inspection · Passed',                    shop:'Texas',                    tags:['routine'] },
-      { dot:'',      date:'Oct 2024 · 62,617 mi', title:'Thermostat Replaced',                              shop:'European Service Center',  tags:['cooling'] },
-      { dot:'',      date:'Aug 2024 · 61,864 mi', title:'Battery Replaced · Charging System Checked',       shop:'European Service Center',  tags:['electrical'] },
-      { dot:'',      date:'Apr 2024 · 59,837 mi', title:'Spark Plugs + Thermostat + Coolant Flush + Sensor',shop:'European Service Center',  tags:['engine','cooling'] },
-      { dot:'major', date:'Mar 2024 · 59,679 mi', title:'Water Pump + Belts + Coolant Flush + Air Filter',  shop:'European Service Center',  tags:['cooling','engine'] },
-      { dot:'minor', date:'Nov 2023 · 57,181 mi', title:'Tires Rotated',                                    shop:'Self Reported',            tags:['tires'] },
-      { dot:'minor', date:'Sep 2023 · 55,798 mi', title:'Oil and Filter Changed',                           shop:'Alternative Automotive',   tags:['routine'] },
-      { dot:'minor', date:'Aug 2022 · 49,167 mi', title:'Oil Change + Brake Fluid Flush',                   shop:'Porsche Dallas',           tags:['routine','brake'] },
-      { dot:'minor', date:'Oct 2022 · 50,261 mi', title:'Headlight Bulbs Replaced',                         shop:'Porsche Dallas',           tags:['electrical'] },
-      { dot:'minor', date:'Dec 2021 · 44,363 mi', title:'Oil and Filter Changed',                           shop:'Porsche Dallas',           tags:['routine'] },
-      { dot:'minor', date:'May 2021 · 39,663 mi', title:'Tires Replaced',                                   shop:'Porsche Dallas',           tags:['tires'] },
-      { dot:'minor', date:'Oct 2020 · 35,179 mi', title:'Oil Change + Emissions Inspection',                shop:'Porsche Dallas',           tags:['routine'] },
-      { dot:'',      date:'Apr 2020 · 31,722 mi', title:'4-Wheel Alignment + Tires + Wheel Repair',         shop:'Porsche Dallas',           tags:['tires'] },
-      { dot:'minor', date:'Oct 2019 · 26,599 mi', title:'30,000 Mile Service',                              shop:'Porsche Dallas',           tags:['routine'] },
-      { dot:'',      date:'Jan 2019 · 18,842 mi', title:'Coolant Flush + Cooling Check + Alignment + Tires',shop:'Porsche Dallas',           tags:['cooling','tires'] },
-      { dot:'minor', date:'Nov 2018',              title:'Antifreeze/Coolant Flush + Emissions Inspection',  shop:'Porsche Dallas',           tags:['cooling'] },
-      { dot:'minor', date:'Mar 2018 · 10,817 mi', title:'4-Wheel Alignment + Tires Replaced',               shop:'Porsche Dallas',           tags:['tires'] },
-      { dot:'minor', date:'Nov 2017 · 7,846 mi',  title:'Oil and Filter Changed',                           shop:'Porsche Dallas',           tags:['routine'] },
-      { dot:'minor', date:'Jan 2017 · 16 mi',     title:'Pre-Delivery Inspection',                          shop:'Porsche Dallas',           tags:['routine'] },
+    timeline:[
+      {dot:'major', date:'Mar 2026 · 71,774 mi', title:'Turbocharger Replaced + Oil Line Seals',            shop:'European Service Center', tags:['turbo']},
+      {dot:'',      date:'Aug 2025 · 66,793 mi', title:'Full Brake Job — Pads, Rotors, Fluid, Sensors',     shop:'European Service Center', tags:['brake']},
+      {dot:'minor', date:'Nov 2025 · 69,069 mi', title:'Emissions Inspection · Passed',                     shop:'Texas DMV',               tags:['routine']},
+      {dot:'',      date:'Oct 2024 · 62,617 mi', title:'Thermostat Replaced',                               shop:'European Service Center', tags:['cooling']},
+      {dot:'',      date:'Aug 2024 · 61,864 mi', title:'Battery Replaced · Charging System Checked',        shop:'European Service Center', tags:['electrical']},
+      {dot:'',      date:'Apr 2024 · 59,837 mi', title:'Spark Plugs + Thermostat + Coolant Flush + Sensor', shop:'European Service Center', tags:['engine','cooling']},
+      {dot:'major', date:'Mar 2024 · 59,679 mi', title:'Water Pump + Belts + Coolant Flush + Air Filter',   shop:'European Service Center', tags:['cooling','engine']},
+      {dot:'minor', date:'Nov 2023 · 57,181 mi', title:'Tires Rotated',                                     shop:'Self',                    tags:['tires']},
+      {dot:'minor', date:'Sep 2023 · 55,798 mi', title:'Oil and Filter Changed',                            shop:'Alternative Automotive',  tags:['routine']},
+      {dot:'minor', date:'Aug 2022 · 49,167 mi', title:'Oil Change + Brake Fluid Flush',                    shop:'Porsche Dallas',          tags:['routine','brake']},
+      {dot:'minor', date:'Oct 2022 · 50,261 mi', title:'Headlight Bulbs Replaced',                          shop:'Porsche Dallas',          tags:['electrical']},
+      {dot:'minor', date:'Dec 2021 · 44,363 mi', title:'Oil and Filter Changed',                            shop:'Porsche Dallas',          tags:['routine']},
+      {dot:'minor', date:'May 2021 · 39,663 mi', title:'Tires Replaced',                                    shop:'Porsche Dallas',          tags:['tires']},
+      {dot:'minor', date:'Oct 2020 · 35,179 mi', title:'Oil Change + Emissions Inspection',                 shop:'Porsche Dallas',          tags:['routine']},
+      {dot:'',      date:'Apr 2020 · 31,722 mi', title:'4-Wheel Alignment + Tires + Wheel Repair',          shop:'Porsche Dallas',          tags:['tires']},
+      {dot:'minor', date:'Oct 2019 · 26,599 mi', title:'30,000 Mile Service',                               shop:'Porsche Dallas',          tags:['routine']},
+      {dot:'',      date:'Jan 2019 · 18,842 mi', title:'Coolant Flush + Cooling Check + Alignment + Tires', shop:'Porsche Dallas',          tags:['cooling','tires']},
+      {dot:'minor', date:'Nov 2018',              title:'Antifreeze/Coolant Flush + Emissions Inspection',  shop:'Porsche Dallas',          tags:['cooling']},
+      {dot:'minor', date:'Mar 2018 · 10,817 mi', title:'4-Wheel Alignment + Tires Replaced',                shop:'Porsche Dallas',          tags:['tires']},
+      {dot:'minor', date:'Nov 2017 · 7,846 mi',  title:'Oil and Filter Changed',                            shop:'Porsche Dallas',          tags:['routine']},
+      {dot:'minor', date:'Jan 2017 · 16 mi',     title:'Pre-Delivery Inspection',                           shop:'Porsche Dallas',          tags:['routine']},
     ],
-
-    // Service shops table
-    shops: [
-      { name:'Porsche Dallas',           visits:20, period:'2017–2023', notes:'Primary shop through original ownership. Dealer-level service.' },
-      { name:'European Service Center',  visits:7,  period:'2024–2026', notes:'Current primary shop. All major repairs since acquisition.' },
-      { name:'Alternative Automotive',   visits:1,  period:'Sep 2023',  notes:'Single oil change at 55,798 mi.' },
-      { name:'Self / DIY',               visits:2,  period:'Nov 2023',  notes:'Self-reported tire rotation and safety inspection.' },
-      { name:'Texas DMV',                visits:5,  period:'2022–2026', notes:'Annual registration, emissions and safety inspections.' },
+    // Manufacturer maintenance schedule for 718 Cayman (2017+)
+    // status: 'ok' | 'upcoming' | 'due' | 'na'
+    // Current odometer: 71,774 mi
+    schedule:{
+      intro:"Based on Porsche's recommended service intervals for the 718 Cayman (2017+). Current odometer: 71,774 mi. Porsche uses a variable oil service indicator; intervals shown are standard guidance.",
+      sections:[
+        {
+          label:'Near Term — Due Now or Overdue',
+          items:[
+            {mi:'75,000 mi', service:'Oil & Filter Change', status:'upcoming', note:'Last done Sep 2023 at 55,798 mi. ~16K miles since last change — past Porsche\'s recommended ~10K interval.'},
+            {mi:'75,000 mi', service:'Tire Inspection / Rotation', status:'upcoming', note:'Last rotation Nov 2023. Recommend inspection for wear given turbo repair work.'},
+            {mi:'75,000 mi', service:'Brake Inspection', status:'ok', note:'Full brake job Aug 2025 at 66,793 mi. Likely good through ~90K.'},
+          ]
+        },
+        {
+          label:'Upcoming — 75K–90K Miles',
+          items:[
+            {mi:'~80,000 mi', service:'Spark Plugs', status:'upcoming', note:'Last replaced Apr 2024 at 59,837 mi. Porsche recommends ~20K–30K intervals for the FA20/FA24 flat-four.'},
+            {mi:'~80,000 mi', service:'Air Filter', status:'upcoming', note:'Last replaced Mar 2024 at 59,679 mi. Inspect at next oil change.'},
+            {mi:'~80,000 mi', service:'Cabin Air Filter', status:'upcoming', note:'No record of replacement. Recommend replacing at next service.'},
+            {mi:'~90,000 mi', service:'Coolant Flush', status:'ok', note:'Flushed Apr 2024 at 59,837 mi. Due again around 80–90K or 2026.'},
+          ]
+        },
+        {
+          label:'Longer Term — 90K+ Miles',
+          items:[
+            {mi:'~90,000 mi', service:'Transmission / PDK Fluid', status:'upcoming', note:'No record of fluid service. Porsche recommends PDK fluid change every ~40K mi. Likely overdue.'},
+            {mi:'~100,000 mi',service:'Rear Differential Fluid', status:'na',    note:'Applicable only to 4WD variants. N/A for standard RWD Cayman.'},
+            {mi:'~100,000 mi',service:'Drive Belt Inspection',   status:'ok',    note:'Belts replaced Mar 2024. Inspect again around 80–90K miles.'},
+            {mi:'~120,000 mi',service:'Fuel Injector Service',   status:'ok',    note:'No current issues. Recommend inspection after 100K.'},
+          ]
+        },
+        {
+          label:'Annual / Calendar-Based',
+          items:[
+            {mi:'Annual',     service:'Safety & Emissions Inspection', status:'ok',    note:'Last passed Nov 2025. Next due Nov 2026.'},
+            {mi:'Every 2 yrs',service:'Brake Fluid Flush',             status:'ok',    note:'Full brake job included fluid Aug 2025. Next due ~2027.'},
+            {mi:'Every 4 yrs',service:'Coolant System Pressure Test',  status:'ok',    note:'Cooling system was extensively serviced 2024. Monitor thermostat.'},
+          ]
+        },
+      ]
+    },
+    shops:[
+      {name:'Porsche Dallas',          visits:14, period:'2017–2023', notes:'Primary shop through original ownership. Dealer-level service for all routine work.'},
+      {name:'European Service Center', visits:6,  period:'2024–2026', notes:'Current primary shop since acquisition. All major repairs and cooling system work.'},
+      {name:'Alternative Automotive',  visits:1,  period:'Sep 2023',  notes:'Single oil change at 55,798 mi.'},
+      {name:'Self / DIY',              visits:1,  period:'Nov 2023',  notes:'Tire rotation reported at 57,181 mi.'},
+      {name:'Texas DMV',               visits:5,  period:'2018–2025', notes:'Biennial emissions and safety inspections.'},
     ],
   },
 
-
   // ─────────────────────────────────────────
-  //  VEHICLE 2: GMC SIERRA 1500
+  //  GMC SIERRA 1500
   // ─────────────────────────────────────────
   sierra: {
     meta: {
-      eyebrow: 'Vehicle Service History',
-      make: 'GMC',
-      model: 'Sierra 1500',
-      subtitle: 'Maintenance Log',
-      firstService: 'Jun 2019',
-      latestService: 'Feb 2026',
-      odometer: '86,484 mi',
-      color: 'Blue / Gray',
-      ownedSince: 'Feb 2023',
+      eyebrow:'Vehicle Service History', make:'GMC', model:'Sierra 1500',
+      subtitle:'Maintenance Log', firstService:'Jun 2019', latestService:'Feb 2026',
+      odometer:'86,484 mi', color:'Blue / Gray', ownedSince:'Feb 2023',
     },
-
-    stats: [
-      { number: '38+', label: 'Service Records' },
-      { number: '15+', label: 'Oil Changes' },
-      { number: '12.8K', label: 'Avg Miles / Year' },
-      { number: '0',   label: 'Major Repairs' },
+    stats:[
+      {number:'29',   label:'Service Records'},
+      {number:'15+',  label:'Oil Changes'},
+      {number:'12.8K',label:'Avg Miles / Year'},
+      {number:'0',    label:'Major Repairs'},
     ],
-
-    milesPerYear: {
-      labels: ['2019','2020','2021','2022','2023','2024','2025','2026'],
-      data:   [4547,  7337,  12338, 14313, 7444,  16170, 11456, 5375],
-      partialYearIndex: 7,
+    milesPerYear:{
+      labels:['2019','2020','2021','2022','2023','2024','2025','2026'],
+      data:  [4547,  7337,  12338, 14313, 7444,  16170, 11456, 5375],
+      partial:7,
     },
-
-    serviceChart: {
-      labels: ['2019','2020','2021','2022','2023','2024','2025','2026'],
-      datasets: [
-        { label:'Routine/Oil',  color:'#5b9bd5', data:[2,3,4,4,5,1,3,2] },
-        { label:'Brakes',       color:'#5dba7d', data:[0,0,0,0,1,0,0,0] },
-        { label:'Transmission', color:'#a78bfa', data:[0,0,0,0,1,0,0,0] },
-        { label:'Fuel/Engine',  color:'#fb923c', data:[0,0,0,0,1,0,0,0] },
-        { label:'Electrical',   color:'#e0d055', data:[0,2,0,0,1,0,0,0] },
-        { label:'Tires',        color:'#8b8b8b', data:[0,1,2,3,2,0,0,1] },
+    serviceChart:{
+      labels:['2019','2020','2021','2022','2023','2024','2025','2026'],
+      datasets:[
+        {label:'Oil & Routine', color:'#5b9bd5', data:[2,3,4,4,5,1,3,2]},
+        {label:'Brakes',        color:'#5dba7d', data:[0,0,0,0,1,0,0,0]},
+        {label:'Transmission',  color:'#a78bfa', data:[0,0,0,1,0,0,0,0]},
+        {label:'Fuel/Engine',   color:'#fb923c', data:[0,0,0,0,1,0,0,0]},
+        {label:'Electrical',    color:'#e0d055', data:[0,2,0,0,1,0,0,0]},
+        {label:'Tires',         color:'#8b8b8b', data:[0,1,2,3,2,0,0,1]},
       ],
-      legend: ['Routine/Oil','Brakes','Transmission','Fuel/Engine','Electrical','Tires'],
+      legend:['Oil & Routine','Brakes','Transmission','Fuel/Engine','Electrical','Tires'],
     },
-
-    mileageProgress: [
-      { label: 'Delivery', width: '0.01%', value: '~0 mi',      accent: false },
-      { label: 'Acquired', width: '62%',   value: '53,664 mi',  accent: false },
-      { label: 'Current',  width: '100%',  value: '86,484 mi',  accent: true  },
+    mileageProgress:[
+      {label:'Delivery', width:'0.01%', value:'~0 mi',     hi:false},
+      {label:'Acquired', width:'62%',   value:'53,664 mi', hi:false},
+      {label:'Current',  width:'100%',  value:'86,484 mi', hi:true },
     ],
-    ownershipNote: "You've added ~32,820 miles since acquiring in Feb 2023",
-
-    alerts: {
-      overview: {
-        icon: '✅',
-        style: 'info-sierra',
-        title: 'Well Maintained — No Major Repairs',
-        body: 'Consistently serviced at Vanguard GMC throughout original ownership, then Christian Brothers after acquisition. Zero major mechanical failures on record.',
-      },
+    ownershipNote:"~32,820 miles added since acquiring in Feb 2023",
+    alerts:{
+      overview:{icon:'✅',style:'info-s',
+        title:'Well Maintained — No Major Repairs',
+        body:'Consistently serviced at Vanguard GMC through original ownership, then Christian Brothers after acquisition. Zero major mechanical failures on record.'},
     },
-
-    navSections: [
-      { id:'overview',     label:'Overview',           dot:'dot-routine',      count:'' },
-      { id:'timeline',     label:'Full Timeline',      dot:'sierra-accent',    count:'38' },
-      { id:'engine',       label:'Engine & Oil',       dot:'dot-engine',       count:'15' },
-      { id:'transmission', label:'Transmission',       dot:'dot-transmission', count:'3' },
-      { id:'fuel',         label:'Fuel & Spark',       dot:'dot-fuel',         count:'2' },
-      { id:'brakes',       label:'Brakes',             dot:'dot-brake',        count:'2' },
-      { id:'tires',        label:'Tires & Alignment',  dot:'grey',             count:'8' },
-      { id:'electrical',   label:'Electrical',         dot:'dot-electrical',   count:'2' },
-      { id:'shops',        label:'Service Shops',      dot:'purple',           count:'' },
+    navSections:[
+      {id:'overview',     label:'Overview',          dot:'#5b9bd5', count:''},
+      {id:'timeline',     label:'Full Timeline',     dot:'#5b9bd5', count:'29'},
+      {id:'schedule',     label:'Maint. Schedule',   dot:'#5dba7d', count:''},
+      {id:'routine',      label:'Oil & Routine',     dot:'#5b9bd5', count:'21', filterTags:['routine']},
+      {id:'engine',       label:'Engine',            dot:'#e08c55', count:'2',  filterTags:['engine']},
+      {id:'transmission', label:'Transmission',      dot:'#a78bfa', count:'1',  filterTags:['transmission']},
+      {id:'fuel',         label:'Fuel & Spark',      dot:'#fb923c', count:'1',  filterTags:['fuel']},
+      {id:'brakes',       label:'Brakes',            dot:'#5dba7d', count:'1',  filterTags:['brake']},
+      {id:'electrical',   label:'Electrical',        dot:'#e0d055', count:'3',  filterTags:['electrical']},
+      {id:'tires',        label:'Tires & Alignment', dot:'#8b8b8b', count:'8',  filterTags:['tires']},
+      {id:'shops',        label:'Service Shops',     dot:'#7b68b5', count:''},
     ],
-
-    timeline: [
-      { dot:'sierra', date:'Jan 2026 · 86,484 mi', title:'4 Tires Replaced (DIY)',                                    shop:'Self-Service',                      tags:['tires'] },
-      { dot:'sierra', date:'Feb 2026 · 85,519 mi', title:'Emissions Inspection + Oil Change',                         shop:'Valvoline / Christian Brothers',    tags:['routine'] },
-      { dot:'minor',  date:'Aug 2025 · 81,189 mi', title:'Oil and Filter Changed',                                    shop:'Christian Brothers Automotive',     tags:['routine'] },
-      { dot:'minor',  date:'Mar 2025 · 75,719 mi', title:'Oil and Filter Changed (DIY)',                              shop:'Self-Service',                      tags:['routine'] },
-      { dot:'minor',  date:'Feb 2025 · 74,748 mi', title:'Oil and Filter Changed',                                    shop:'Christian Brothers Automotive',     tags:['routine'] },
-      { dot:'minor',  date:'Jul 2024 · 70,111 mi', title:'Oil and Filter Changed',                                    shop:'Christian Brothers Automotive',     tags:['routine'] },
-      { dot:'minor',  date:'Dec 2023 · 67,971 mi', title:'Oil Change + Tires Rotated',                               shop:'Christian Brothers Automotive',     tags:['routine','tires'] },
-      { dot:'minor',  date:'Dec 2023 · 65,718 mi', title:'Oil Change + Tires Rotated',                               shop:'Christian Brothers Automotive',     tags:['routine','tires'] },
-      { dot:'minor',  date:'Jul 2023 · 61,246 mi', title:'Oil Change + Tires Rotated + Recommended Maintenance',      shop:'Christian Brothers Automotive',     tags:['routine','tires'] },
-      { dot:'sierra', date:'Jun 2023 · 60,099 mi', title:'Spark Plugs + Wires + Fuel System Service',                shop:'Christian Brothers Automotive',     tags:['fuel','engine'] },
-      { dot:'sierra', date:'Mar 2023 · 55,704 mi', title:'2-Wheel Alignment + Inspection',                           shop:'Ewing Buick GMC',                   tags:['tires'] },
-      { dot:'sierra', date:'Feb 2023 · 54,747 mi', title:'Brake Fluid Flush + Computer Reprogrammed',               shop:'Vanguard GMC of Carrollton',        tags:['brake','electrical'] },
-      { dot:'minor',  date:'Jan 2023 · 53,941 mi', title:'Pre-Purchase Inspection',                                  shop:'Christian Brothers Automotive',     tags:['routine'] },
-      { dot:'major',  date:'Dec 2022 · 53,664 mi', title:'Full Pre-Delivery Service — Transmission, Differential, Lifters', shop:'Vanguard GMC of Carrollton', tags:['transmission','engine'] },
-      { dot:'minor',  date:'Aug 2022 · 48,255 mi', title:'Oil Change + Air Filters + Tires Rotated + Inspection',   shop:'Vanguard GMC of Carrollton',        tags:['routine','tires'] },
-      { dot:'minor',  date:'Jun 2022 · 44,475 mi', title:'Oil Change + Tires Balanced',                             shop:'Vanguard GMC of Carrollton',        tags:['routine','tires'] },
-      { dot:'sierra', date:'Apr 2022 · 42,123 mi', title:'4 Tires Replaced + 4-Wheel Alignment',                    shop:'Vanguard GMC of Carrollton',        tags:['tires'] },
-      { dot:'minor',  date:'Jan 2022 · 36,227 mi', title:'Oil Change + Tires Rotated + Fluids Checked',             shop:'Vanguard GMC of Carrollton',        tags:['routine'] },
-      { dot:'minor',  date:'Sep 2021 · 30,276 mi', title:'Safety Inspection',                                        shop:'Christian Brothers Automotive',     tags:['routine'] },
-      { dot:'minor',  date:'Sep 2021 · 30,222 mi', title:'Oil Change + Tires Rotated',                              shop:'Vanguard GMC of Carrollton',        tags:['routine'] },
-      { dot:'minor',  date:'May 2021 · 23,810 mi', title:'Oil Change + Air Filter + Tires Rotated',                 shop:'Vanguard GMC of Carrollton',        tags:['routine'] },
-      { dot:'minor',  date:'Jan 2021 · 17,942 mi', title:'Oil Change + Tires Rotated',                              shop:'Vanguard GMC of Carrollton',        tags:['routine'] },
-      { dot:'minor',  date:'Aug 2020 · 11,884 mi', title:'Oil Change + Tires Rotated',                              shop:'Vanguard GMC of Carrollton',        tags:['routine'] },
-      { dot:'minor',  date:'Apr 2020 · 8,026 mi',  title:'Body Computer/Module Reprogrammed',                       shop:'Vanguard GMC of Carrollton',        tags:['electrical'] },
-      { dot:'minor',  date:'Feb 2020 · 5,863 mi',  title:'Oil and Filter Changed',                                  shop:'Vanguard GMC of Carrollton',        tags:['routine'] },
-      { dot:'minor',  date:'Jan 2020 · 4,547 mi',  title:'Battery / Charging System Checked',                       shop:'Vanguard GMC of Carrollton',        tags:['electrical'] },
-      { dot:'minor',  date:'Nov 2019 · 1,018 mi',  title:'Window Tint Installed',                                   shop:'Vanguard GMC of Carrollton',        tags:['routine'] },
-      { dot:'minor',  date:'Oct 2019',              title:'Tonneau Cover Installed',                                 shop:'Vanguard GMC of Carrollton',        tags:['routine'] },
-      { dot:'minor',  date:'Jun 2019',              title:'Pre-Delivery Inspection',                                 shop:'Lawrence Hall Chevrolet',           tags:['routine'] },
+    timeline:[
+      {dot:'s',    date:'Jan 2026 · 86,484 mi', title:'4 Tires Replaced (DIY)',                                           shop:'Self-Service',                   tags:['tires']},
+      {dot:'s',    date:'Feb 2026 · 85,519 mi', title:'Emissions Inspection + Oil Change',                                shop:'Valvoline / Christian Brothers', tags:['routine']},
+      {dot:'minor',date:'Aug 2025 · 81,189 mi', title:'Oil and Filter Changed',                                           shop:'Christian Brothers Automotive',  tags:['routine']},
+      {dot:'minor',date:'Mar 2025 · 75,719 mi', title:'Oil and Filter Changed (DIY)',                                     shop:'Self-Service',                   tags:['routine']},
+      {dot:'minor',date:'Feb 2025 · 74,748 mi', title:'Oil and Filter Changed',                                           shop:'Christian Brothers Automotive',  tags:['routine']},
+      {dot:'minor',date:'Jul 2024 · 70,111 mi', title:'Oil and Filter Changed',                                           shop:'Christian Brothers Automotive',  tags:['routine']},
+      {dot:'minor',date:'Dec 2023 · 67,971 mi', title:'Oil Change + Tires Rotated',                                       shop:'Christian Brothers Automotive',  tags:['routine','tires']},
+      {dot:'minor',date:'Dec 2023 · 65,718 mi', title:'Oil Change + Tires Rotated',                                       shop:'Christian Brothers Automotive',  tags:['routine','tires']},
+      {dot:'minor',date:'Jul 2023 · 61,246 mi', title:'Oil Change + Tires Rotated + Recommended Maintenance',             shop:'Christian Brothers Automotive',  tags:['routine','tires']},
+      {dot:'s',    date:'Jun 2023 · 60,099 mi', title:'Spark Plugs + Wires + Fuel System Service',                       shop:'Christian Brothers Automotive',  tags:['fuel','engine']},
+      {dot:'s',    date:'Mar 2023 · 55,704 mi', title:'2-Wheel Alignment + Inspection',                                   shop:'Ewing Buick GMC',                tags:['tires']},
+      {dot:'s',    date:'Feb 2023 · 54,747 mi', title:'Brake Fluid Flush + Computer Reprogrammed',                       shop:'Vanguard GMC of Carrollton',     tags:['brake','electrical']},
+      {dot:'minor',date:'Jan 2023 · 53,941 mi', title:'Pre-Purchase Inspection',                                          shop:'Christian Brothers Automotive',  tags:['routine']},
+      {dot:'major',date:'Dec 2022 · 53,664 mi', title:'Full Pre-Delivery Service — Transmission, Differential, Lifters', shop:'Vanguard GMC of Carrollton',     tags:['transmission','engine']},
+      {dot:'minor',date:'Aug 2022 · 48,255 mi', title:'Oil Change + Air Filters + Tires Rotated + Inspection',           shop:'Vanguard GMC of Carrollton',     tags:['routine','tires']},
+      {dot:'minor',date:'Jun 2022 · 44,475 mi', title:'Oil Change + Tires Balanced',                                     shop:'Vanguard GMC of Carrollton',     tags:['routine','tires']},
+      {dot:'s',    date:'Apr 2022 · 42,123 mi', title:'4 Tires Replaced + 4-Wheel Alignment',                           shop:'Vanguard GMC of Carrollton',     tags:['tires']},
+      {dot:'minor',date:'Jan 2022 · 36,227 mi', title:'Oil Change + Tires Rotated + Fluids Checked',                    shop:'Vanguard GMC of Carrollton',     tags:['routine']},
+      {dot:'minor',date:'Sep 2021 · 30,276 mi', title:'Safety Inspection',                                               shop:'Christian Brothers Automotive',  tags:['routine']},
+      {dot:'minor',date:'Sep 2021 · 30,222 mi', title:'Oil Change + Tires Rotated',                                     shop:'Vanguard GMC of Carrollton',     tags:['routine']},
+      {dot:'minor',date:'May 2021 · 23,810 mi', title:'Oil Change + Air Filter + Tires Rotated',                        shop:'Vanguard GMC of Carrollton',     tags:['routine']},
+      {dot:'minor',date:'Jan 2021 · 17,942 mi', title:'Oil Change + Tires Rotated',                                     shop:'Vanguard GMC of Carrollton',     tags:['routine']},
+      {dot:'minor',date:'Aug 2020 · 11,884 mi', title:'Oil Change + Tires Rotated',                                     shop:'Vanguard GMC of Carrollton',     tags:['routine']},
+      {dot:'minor',date:'Apr 2020 · 8,026 mi',  title:'Body Computer/Module Reprogrammed',                              shop:'Vanguard GMC of Carrollton',     tags:['electrical']},
+      {dot:'minor',date:'Feb 2020 · 5,863 mi',  title:'Oil and Filter Changed',                                         shop:'Vanguard GMC of Carrollton',     tags:['routine']},
+      {dot:'minor',date:'Jan 2020 · 4,547 mi',  title:'Battery / Charging System Checked',                              shop:'Vanguard GMC of Carrollton',     tags:['electrical']},
+      {dot:'minor',date:'Nov 2019 · 1,018 mi',  title:'Window Tint Installed',                                          shop:'Vanguard GMC of Carrollton',     tags:['routine']},
+      {dot:'minor',date:'Oct 2019',              title:'Tonneau Cover Installed',                                        shop:'Vanguard GMC of Carrollton',     tags:['routine']},
+      {dot:'minor',date:'Jun 2019',              title:'Pre-Delivery Inspection',                                        shop:'Lawrence Hall Chevrolet',        tags:['routine']},
     ],
-
-    shops: [
-      { name:'Vanguard GMC of Carrollton', visits:18, period:'2019–2023', notes:'Primary dealer through original ownership. All warranty and scheduled maintenance.' },
-      { name:'Christian Brothers Automotive', visits:12, period:'2021–2026', notes:'Pre-purchase inspection and primary shop after acquisition. All routine oil changes.' },
-      { name:'Ewing Buick GMC',            visits:1,  period:'Mar 2023',  notes:'Single alignment service at 55,704 mi.' },
-      { name:'Valvoline Instant Oil Change',visits:1,  period:'Feb 2026',  notes:'Emissions inspection at 85,519 mi.' },
-      { name:'Self / DIY',                 visits:2,  period:'2025–2026', notes:'DIY oil change (Mar 2025) and tire replacement (Jan 2026).' },
-      { name:'Texas DMV',                  visits:4,  period:'2023–2026', notes:'Annual registration and safety/emissions inspections.' },
+    // Manufacturer maintenance schedule for GMC Sierra 1500 5.3L V8 (2019+)
+    // Current odometer: 86,484 mi
+    schedule:{
+      intro:"Based on GM's recommended maintenance schedule for the 2019 Sierra 1500 5.3L V8 (Duramax oil life system). Current odometer: 86,484 mi. GM uses an Oil Life Monitor; intervals reflect standard guidance.",
+      sections:[
+        {
+          label:'Near Term — Due Now or Overdue',
+          items:[
+            {mi:'90,000 mi',  service:'Oil & Filter Change', status:'ok',      note:'Last done Feb 2026 at 85,519 mi. ~5K miles ago — on track with 5K–7.5K interval.'},
+            {mi:'90,000 mi',  service:'Tire Rotation',       status:'upcoming', note:'Last rotation Dec 2023. New tires installed Jan 2026 — rotation due at next oil change (~90K).'},
+            {mi:'90,000 mi',  service:'Brake Inspection',    status:'upcoming', note:'Brake fluid flushed Feb 2023. No record of pad/rotor inspection since. Recommend at next service.'},
+          ]
+        },
+        {
+          label:'Upcoming — 90K–100K Miles',
+          items:[
+            {mi:'~90,000 mi', service:'Air Filter (Engine)', status:'upcoming', note:'Last replaced Aug 2022 at ~48K mi. Past GM\'s ~45K recommendation. Overdue — replace soon.'},
+            {mi:'~90,000 mi', service:'Cabin Air Filter',    status:'due',      note:'No record of replacement. GM recommends every 25K mi. Likely overdue.'},
+            {mi:'~90,000 mi', service:'Fuel System Cleaning',status:'ok',       note:'Fuel system service done Jun 2023 at 60,099 mi. Due again around 90–100K.'},
+            {mi:'~95,000 mi', service:'Spark Plugs (Iridium)',status:'ok',      note:'Replaced Jun 2023 at 60,099 mi. GM AC Delco iridium plugs rated 100K mi. Next ~160K.'},
+          ]
+        },
+        {
+          label:'Longer Term — 100K+ Miles',
+          items:[
+            {mi:'~100,000 mi',service:'Transmission Fluid',    status:'ok',   note:'Transmission serviced Dec 2022 at 53,664 mi delivery prep. GM recommends 45K interval under severe duty. Inspect ~100K.'},
+            {mi:'~100,000 mi',service:'Differential Fluid',    status:'ok',   note:'Serviced Dec 2022. GM recommends ~50K intervals under tow/haul. Inspect ~100K.'},
+            {mi:'~100,000 mi',service:'Transfer Case Fluid',   status:'upcoming', note:'No separate record. Inspect at next major service.'},
+            {mi:'~100,000 mi',service:'Coolant Flush',         status:'upcoming', note:'No coolant flush on record. GM DEX-COOL rated 5 yr / 150K. Inspect and flush ~100K.'},
+            {mi:'~150,000 mi',service:'Serpentine Belt',       status:'ok',   note:'No issues reported. GM recommends inspection every 60K, replacement ~150K.'},
+          ]
+        },
+        {
+          label:'Annual / Calendar-Based',
+          items:[
+            {mi:'Annual',     service:'Safety & Emissions Inspection', status:'ok',      note:'Last passed Feb 2026. Next due Feb 2027.'},
+            {mi:'Every 2 yrs',service:'Brake Fluid Flush',             status:'upcoming',note:'Last flushed Feb 2023. Due again ~Feb 2025 — overdue. Recommend at next service visit.'},
+            {mi:'Every 5 yrs',service:'Battery Test / Replace',        status:'ok',      note:'Battery checked Jan 2020. Consider proactive test — vehicle is 6+ years old.'},
+          ]
+        },
+      ]
+    },
+    shops:[
+      {name:'Vanguard GMC of Carrollton',    visits:16, period:'2019–2023', notes:'Primary dealer through original ownership. All warranty and scheduled dealer maintenance.'},
+      {name:'Christian Brothers Automotive', visits:10, period:'2021–2026', notes:'Pre-purchase inspection and primary independent shop after acquisition.'},
+      {name:'Ewing Buick GMC',               visits:1,  period:'Mar 2023',  notes:'Single alignment service at 55,704 mi.'},
+      {name:'Valvoline Instant Oil Change',  visits:1,  period:'Feb 2026',  notes:'Emissions + oil change at 85,519 mi.'},
+      {name:'Self / DIY',                    visits:2,  period:'2025–2026', notes:'DIY oil change Mar 2025 and tire replacement Jan 2026.'},
+      {name:'Texas DMV',                     visits:4,  period:'2022–2026', notes:'Annual safety and emissions inspections.'},
     ],
   },
-
 };
-// ═══════════════════════════════════════════════════════════════════
-//  END OF DATA — Nothing below this line needs editing for records
-// ═══════════════════════════════════════════════════════════════════
 </script>
 
-<!-- ── VEHICLE TABS (rendered by JS) ── -->
-<div class="vehicle-tabs" style="position:relative;" id="vehicle-tabs">
+<div class="vehicle-tabs" style="position:relative;" id="vtabs">
   <div class="garage-label">My Garage</div>
-  <!-- tabs injected by JS -->
   <div class="search-wrap">
-    <div class="search-input-wrap">
-      <span class="search-icon">⌕</span>
+    <div class="siw">
+      <span class="sic">⌕</span>
       <input type="text" id="search-input" placeholder="Search all records…" autocomplete="off" oninput="onSearch(this.value)">
-      <span class="search-clear" id="search-clear" onclick="clearSearch()">✕</span>
+      <span class="scl" id="scl" onclick="clearSearch()">✕</span>
     </div>
   </div>
 </div>
 
-<!-- ── SEARCH RESULTS OVERLAY ── -->
 <div id="search-results">
-  <div class="sr-header">
-    <span>Search Results</span>
-    <span class="sr-count" id="sr-count"></span>
-  </div>
-  <div id="sr-list"></div>
+  <div class="srh"><span>Search Results</span><span class="src" id="src"></span></div>
+  <div id="srl"></div>
 </div>
 
-<!-- ── VEHICLE PANELS (rendered by JS) ── -->
-<div id="panels-container"></div>
+<div id="panels"></div>
 
 <script>
-// ── TAG STYLES ────────────────────────────────────────────────
-const TAG_STYLES = {
-  routine:      { cls:'tag-routine',     label:'Routine',      color:'#5b9bd5' },
-  engine:       { cls:'tag-engine',      label:'Engine',       color:'#e08c55' },
-  brake:        { cls:'tag-brake',       label:'Brakes',       color:'#5dba7d' },
-  cooling:      { cls:'tag-cooling',     label:'Cooling',      color:'#c86e9a' },
-  electrical:   { cls:'tag-electrical',  label:'Electrical',   color:'#e0d055' },
-  major:        { cls:'tag-major',       label:'Major',        color:'#e05555' },
-  turbo:        { cls:'tag-turbo',       label:'Turbo',        color:'#c8a96e' },
-  transmission: { cls:'tag-transmission',label:'Transmission', color:'#a78bfa' },
-  fuel:         { cls:'tag-fuel',        label:'Fuel',         color:'#fb923c' },
-  tires:        { cls:'tag-tires',       label:'Tires',        color:'#8b8b8b' },
-  inspection:   { cls:'tag-routine',     label:'Inspection',   color:'#5b9bd5' },
-  accessories:  { cls:'tag-routine',     label:'Accessories',  color:'#888888' },
+// ── UNIFIED TAG STYLES ─────────────────────────────────────────
+// Single source of truth for every label, color, and CSS class.
+// Used in: timeline tags, card borders, search results, chart legends.
+const TS = {
+  routine:      {cls:'tag-routine',     label:'Oil & Routine', color:'#5b9bd5'},
+  engine:       {cls:'tag-engine',      label:'Engine',        color:'#e08c55'},
+  brake:        {cls:'tag-brake',       label:'Brakes',        color:'#5dba7d'},
+  cooling:      {cls:'tag-cooling',     label:'Cooling',       color:'#c86e9a'},
+  electrical:   {cls:'tag-electrical',  label:'Electrical',    color:'#e0d055'},
+  turbo:        {cls:'tag-turbo',       label:'Turbo',         color:'#c8a96e'},
+  transmission: {cls:'tag-transmission',label:'Transmission',  color:'#a78bfa'},
+  fuel:         {cls:'tag-fuel',        label:'Fuel',          color:'#fb923c'},
+  tires:        {cls:'tag-tires',       label:'Tires',         color:'#8b8b8b'},
 };
 
-const DOT_COLORS = {
-  'dot-routine':      '#5b9bd5',
-  'dot-engine':       '#e08c55',
-  'dot-brake':        '#5dba7d',
-  'dot-cooling':      '#c86e9a',
-  'dot-electrical':   '#e0d055',
-  'dot-major':        '#e05555',
-  'dot-turbo':        '#c8a96e',
-  'dot-transmission': '#a78bfa',
-  'dot-fuel':         '#fb923c',
-  'grey':             '#8b8b8b',
-  'purple':           '#7b68b5',
-  'accent':           '#c8a96e',
-  'sierra-accent':    '#5b9bd5',
-};
-
-// ── RENDER HELPERS ────────────────────────────────────────────
 function tagHtml(tags) {
   return tags.map(t => {
-    const s = TAG_STYLES[t] || TAG_STYLES.routine;
-    return `<span class="tag ${s.cls}">${s.label}</span>`;
+    const s = TS[t];
+    return s ? `<span class="tag ${s.cls}">${s.label}</span>` : '';
   }).join('');
 }
 
-function timelineItemHtml(item, vehicle) {
-  const dotClass = item.dot === 'sierra' ? 'timeline-dot sierra'
-    : item.dot === 'major' ? 'timeline-dot major'
-    : item.dot === 'minor' ? 'timeline-dot minor'
-    : 'timeline-dot';
-  const dateClass = vehicle === 'sierra' ? 'tl-date sierra' : 'tl-date';
-  return `
-    <div class="timeline-item">
-      <div class="${dotClass}"></div>
-      <div class="${dateClass}">${item.date}</div>
-      <div class="tl-title">${item.title}</div>
-      <div class="tl-meta">${item.shop}</div>
-      <div class="tl-tags">${tagHtml(item.tags)}</div>
-    </div>`;
+// ── RENDER HELPERS ─────────────────────────────────────────────
+function alertHtml(a, v) {
+  if (!a) return '';
+  const warn = a.style === 'warn';
+  const infoS = a.style === 'info-s';
+  const bk = warn ? 'rgba(224,85,85,.05)' : infoS ? 'rgba(91,155,213,.05)' : 'rgba(200,110,154,.05)';
+  const bd = warn ? 'rgba(224,85,85,.25)' : infoS ? 'rgba(91,155,213,.25)' : 'rgba(200,110,154,.25)';
+  const tc = warn ? 'var(--red)' : infoS ? 'var(--sa)' : '#c86e9a';
+  return `<div class="alert-card" style="background:${bk};border-color:${bd};">
+    <div class="ai">${a.icon}</div>
+    <div class="at"><h4 style="color:${tc};">${a.title}</h4><p>${a.body}</p></div>
+  </div>`;
 }
 
-function shopsTableHtml(shops, vehicle) {
-  const rows = shops.map(s => `
-    <tr>
-      <td><div class="shop-name">${s.name}</div></td>
-      <td><div class="shop-visits${vehicle==='sierra'?' sierra':''}">${s.visits}</div></td>
-      <td><div class="shop-era">${s.period}</div></td>
-      <td style="font-size:12px;color:var(--text-dim);">${s.notes}</td>
-    </tr>`).join('');
+function tliHtml(item, v) {
+  const isSierra = v === 'sierra';
+  const dc = item.dot === 's' ? 'tdot s'
+    : item.dot === 'major' ? 'tdot major'
+    : item.dot === 'minor' ? 'tdot minor'
+    : 'tdot';
+  return `<div class="tli">
+    <div class="${dc}"></div>
+    <div class="td${isSierra?' s':''}">${item.date}</div>
+    <div class="tt">${item.title}</div>
+    <div class="tm">${item.shop}</div>
+    <div class="ttags">${tagHtml(item.tags)}</div>
+  </div>`;
+}
+
+function mileBarHtml(v) {
+  const d = GARAGE[v];
+  const isSierra = v === 'sierra';
+  const accentVar = isSierra ? 'var(--sa)' : 'var(--accent)';
+  const bars = d.mileageProgress.map(b => `
+    <div class="mile-row">
+      <span class="mile-key">${b.label}</span>
+      <div class="mile-track"><div class="mile-fill${isSierra?' s':''}" style="width:${b.width}"></div></div>
+      <span class="mile-val" style="color:${b.hi ? accentVar : 'var(--text-dim)'};">${b.value}</span>
+    </div>`).join('');
+  return `<div class="mile-wrap">
+    <div class="mile-lbl">Mileage Progression</div>
+    ${bars}
+    <div class="own-badge">◈ ${d.ownershipNote}</div>
+  </div>`;
+}
+
+function scheduleHtml(d, v) {
+  const isSierra = v === 'sierra';
+  const sc = d.schedule;
+  let h = `<p class="maint-intro">${sc.intro}</p>`;
+  sc.sections.forEach(sec => {
+    h += `<div class="maint-section-lbl">${sec.label}</div>`;
+    h += `<div class="maint-band">
+      <div class="maint-row header-row">
+        <div class="maint-cell mhdr">Mileage</div>
+        <div class="maint-cell mhdr">Service Item</div>
+        <div class="maint-cell mhdr">Status</div>
+      </div>`;
+    sec.items.forEach(item => {
+      const sc2 = {due:'due',upcoming:'upcoming',ok:'ok',na:'na'}[item.status] || 'na';
+      const sl2 = {due:'Overdue',upcoming:'Due Soon',ok:'On Track',na:'N/A'}[item.status] || 'N/A';
+      h += `<div class="maint-row">
+        <div class="maint-cell"><span class="maint-mi${isSierra?' s':''}">${item.mi}</span></div>
+        <div class="maint-cell">
+          <div class="maint-item">${item.service}</div>
+          <div class="maint-note">${item.note}</div>
+        </div>
+        <div class="maint-cell" style="display:flex;align-items:flex-start;padding-top:16px;">
+          <span class="maint-status ${sc2}">${sl2}</span>
+        </div>
+      </div>`;
+    });
+    h += '</div>';
+  });
+  return h;
+}
+
+function shopsHtml(shops, v) {
+  const isSierra = v === 'sierra';
+  const rows = shops.map(s => `<tr>
+    <td><div class="shn">${s.name}</div></td>
+    <td><div class="shv${isSierra?' s':''}">${s.visits}</div></td>
+    <td><div class="she">${s.period}</div></td>
+    <td style="font-size:12px;color:var(--text-dim);">${s.notes}</td>
+  </tr>`).join('');
   return `<table class="shop-table">
     <thead><tr><th>Shop</th><th>Visits</th><th>Period</th><th>Notes</th></tr></thead>
     <tbody>${rows}</tbody>
   </table>`;
 }
 
-function mileageBarHtml(v) {
-  const d = GARAGE[v];
-  const bars = d.mileageProgress.map(b => `
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
-      <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);width:72px;">${b.label}</span>
-      <div class="mile-track" style="flex:1;"><div class="mile-fill${v==='sierra'?' sierra':''}" style="width:${b.width}"></div></div>
-      <span style="font-family:'DM Mono',monospace;font-size:11px;color:${b.accent?'var(--'+(v==='sierra'?'sierra-':'')+'accent)':'var(--text-dim)'};width:58px;text-align:right;">${b.value}</span>
-    </div>`).join('');
-  const badgeSpan = v === 'sierra' ? '<span class="sierra">◈</span>' : '<span>◈</span>';
-  return `
-    <div class="mileage-section" style="margin-top:28px;">
-      <div class="mile-label">Mileage Progression</div>
-      ${bars}
-      <div class="ownership-badge">${badgeSpan} ${d.ownershipNote}</div>
-    </div>`;
-}
-
-function alertHtml(alert, v) {
-  if (!alert) return '';
-  const isSierra = v === 'sierra';
-  const isInfo = alert.style === 'info' || alert.style === 'info-sierra';
-  const bk = isInfo
-    ? (isSierra ? 'rgba(91,155,213,0.05)' : 'rgba(200,110,154,0.05)')
-    : 'rgba(224,85,85,0.05)';
-  const bd = isInfo
-    ? (isSierra ? 'rgba(91,155,213,0.25)' : 'rgba(200,110,154,0.25)')
-    : 'rgba(224,85,85,0.25)';
-  const tc = isInfo
-    ? (isSierra ? 'var(--sierra-accent)' : '#c86e9a')
-    : 'var(--red)';
-  return `
-    <div class="alert-card" style="background:${bk};border-color:${bd};">
-      <div class="alert-icon">${alert.icon}</div>
-      <div class="alert-text">
-        <h4 style="color:${tc};">${alert.title}</h4>
-        <p>${alert.body}</p>
-      </div>
-    </div>`;
-}
-
-// ── BUILD SECTION CONTENT ─────────────────────────────────────
-// Each vehicle has sections that share the same .section[id] structure.
-// Only the overview and timeline are universal; the rest are vehicle-specific.
-// We render a generic "section" for anything not explicitly handled.
-
+// ── BUILD SECTIONS ─────────────────────────────────────────────
 function buildSections(v) {
   const d = GARAGE[v];
   const isSierra = v === 'sierra';
-  const accentVar = isSierra ? 'var(--sierra-accent)' : 'var(--accent)';
-  let html = '';
+  let h = '';
 
-  // Build all sections declared in navSections
   d.navSections.forEach((nav, idx) => {
-    const sid = `${v}-${nav.id}`;
-    const isFirst = idx === 0;
-    html += `<div id="${sid}" class="section${isFirst?' visible':''}">`;
+    h += `<div id="${v}-${nav.id}" class="section${idx===0?' visible':''}">`;
 
-    // ── OVERVIEW ──
     if (nav.id === 'overview') {
-      html += `
-        <div class="section-header">
-          <h2 class="section-title">Overview</h2>
-          <span class="section-subtitle">${d.meta.firstService} – ${d.meta.latestService} · ${d.meta.odometer}</span>
-        </div>
-        ${alertHtml(d.alerts?.overview, v)}
-        ${mileageBarHtml(v)}`;
-      // Overview cards: first 4 timeline items that are not minor
-      const featured = d.timeline.filter(t => t.dot !== 'minor').slice(0,4);
-      if (featured.length) {
-        html += '<div class="cards-grid" style="margin-top:28px;">';
-        featured.forEach(item => {
-          const cardType = item.tags[0] || 'routine';
-          const odoClass = isSierra ? 'card-odo sierra' : 'card-odo';
+      h += `<div class="sec-hdr">
+        <h2 class="sec-title">Overview</h2>
+        <span class="sec-sub">${d.meta.firstService} – ${d.meta.latestService} · ${d.meta.odometer}</span>
+      </div>
+      ${alertHtml(d.alerts?.overview, v)}
+      ${mileBarHtml(v)}`;
+      // Featured cards: non-minor records, up to 4
+      const feat = d.timeline.filter(t => t.dot !== 'minor').slice(0,4);
+      if (feat.length) {
+        h += '<div class="cards-grid" style="margin-top:28px;">';
+        feat.forEach(item => {
+          const ct = item.tags[0] || 'routine';
           const odo = item.date.includes('·') ? item.date.split('·')[1].trim() : '';
-          html += `
-            <div class="card ${cardType}">
-              <div class="card-date">${item.date}</div>
-              <div class="card-title">${item.title}</div>
-              <div class="card-shop">${item.shop}</div>
-              ${odo ? `<div class="${odoClass}">${odo}</div>` : ''}
-            </div>`;
+          h += `<div class="card ${ct}">
+            <div class="cd">${item.date}</div>
+            <div class="ct2">${item.title}</div>
+            <div class="csh">${item.shop}</div>
+            ${odo?`<div class="codo${isSierra?' s':''}">${odo}</div>`:''}
+          </div>`;
         });
-        html += '</div>';
+        h += '</div>';
       }
     }
 
-    // ── TIMELINE ──
     else if (nav.id === 'timeline') {
-      html += `
-        <div class="section-header">
-          <h2 class="section-title">Full Timeline</h2>
-          <span class="section-subtitle">Chronological · All Services</span>
-        </div>
-        <div class="timeline${isSierra?' sierra-tl':''}">
-          ${d.timeline.map(item => timelineItemHtml(item, v)).join('')}
-        </div>`;
+      h += `<div class="sec-hdr">
+        <h2 class="sec-title">Full Timeline</h2>
+        <span class="sec-sub">Chronological · All ${d.timeline.length} Services</span>
+      </div>
+      <div class="timeline${isSierra?' stl':''}">
+        ${d.timeline.map(item => tliHtml(item, v)).join('')}
+      </div>`;
     }
 
-    // ── SHOPS ──
+    else if (nav.id === 'schedule') {
+      h += `<div class="sec-hdr">
+        <h2 class="sec-title">Maintenance Schedule</h2>
+        <span class="sec-sub">Manufacturer Recommended · Forward Looking</span>
+      </div>
+      ${scheduleHtml(d, v)}`;
+    }
+
     else if (nav.id === 'shops') {
-      html += `
-        <div class="section-header">
-          <h2 class="section-title">Service Shops</h2>
-          <span class="section-subtitle">Where The Work Was Done</span>
-        </div>
-        ${shopsTableHtml(d.shops, v)}`;
+      h += `<div class="sec-hdr">
+        <h2 class="sec-title">Service Shops</h2>
+        <span class="sec-sub">Where The Work Was Done</span>
+      </div>
+      ${shopsHtml(d.shops, v)}`;
     }
 
-    // ── GENERIC SECTION (engine, brakes, transmission, etc.) ──
     else {
-      // Filter timeline items relevant to this section by matching tag keys
-      // The nav id is used as the tag filter key
-      const tagMap = {
-        engine:      ['engine'],
-        brakes:      ['brake'],
-        cooling:     ['cooling'],
-        turbo:       ['turbo','major'],
-        electrical:  ['electrical'],
-        tires:       ['tires'],
-        transmission:['transmission'],
-        fuel:        ['fuel'],
-      };
-      const filterTags = tagMap[nav.id] || [nav.id];
-      const items = d.timeline.filter(t =>
-        t.tags.some(tag => filterTags.includes(tag))
-      );
+      // Generic filtered section — uses nav.filterTags exclusively.
+      // Records appear here if ANY of their tags match filterTags.
+      // A record with ['routine','brake'] will appear in both Oil & Routine
+      // and Brakes — this is correct as the work genuinely covers both.
+      const ft = nav.filterTags || [];
+      const items = d.timeline.filter(t => t.tags.some(tag => ft.includes(tag)));
 
-      const alertKey = nav.id;
-      html += `
-        <div class="section-header">
-          <h2 class="section-title">${nav.label}</h2>
-          <span class="section-subtitle">${nav.count ? nav.count + ' Records' : ''}</span>
-        </div>
-        ${d.alerts?.[alertKey] ? alertHtml(d.alerts[alertKey], v) : ''}
-        <div class="cards-grid">`;
+      h += `<div class="sec-hdr">
+        <h2 class="sec-title">${nav.label}</h2>
+        <span class="sec-sub">${items.length} Record${items.length!==1?'s':''}</span>
+      </div>
+      ${d.alerts?.[nav.id] ? alertHtml(d.alerts[nav.id], v) : ''}
+      <div class="cards-grid">`;
 
       items.forEach(item => {
-        const cardType = item.tags[0] || 'routine';
-        const odoClass = isSierra ? 'card-odo sierra' : 'card-odo';
+        const ct = item.tags[0] || 'routine';
         const odo = item.date.includes('·') ? item.date.split('·')[1].trim() : '';
-        html += `
-          <div class="card ${cardType}">
-            <div class="card-date">${item.date}</div>
-            <div class="card-title">${item.title}</div>
-            <div class="card-shop">${item.shop}</div>
-            ${odo ? `<div class="${odoClass}">${odo}</div>` : ''}
-          </div>`;
+        h += `<div class="card ${ct}">
+          <div class="cd">${item.date}</div>
+          <div class="ct2">${item.title}</div>
+          <div class="csh">${item.shop}</div>
+          ${odo?`<div class="codo${isSierra?' s':''}">${odo}</div>`:''}
+        </div>`;
       });
-
-      html += '</div>';
+      h += '</div>';
     }
 
-    html += '</div>'; // close .section
+    h += '</div>';
   });
-  return html;
+  return h;
 }
 
-// ── BUILD VEHICLE PANEL HTML ──────────────────────────────────
+// ── BUILD PANEL ────────────────────────────────────────────────
 function buildPanel(v) {
   const d = GARAGE[v];
   const isSierra = v === 'sierra';
-  const accentVar = isSierra ? 'var(--sierra-accent)' : 'var(--accent)';
 
-  // Stats bar
-  const statsHtml = d.stats.map(s => `
-    <div class="stat${isSierra?' sierra':''}">
-      <div class="stat-number${isSierra?' sierra':''}">${s.number}</div>
-      <div class="stat-label">${s.label}</div>
+  const statsH = d.stats.map(s => `<div class="stat${isSierra?' s':''}">
+    <div class="sn${isSierra?' s':''}">${s.number}</div>
+    <div class="sl">${s.label}</div>
+  </div>`).join('');
+
+  const legH = d.serviceChart.legend.map(lbl => {
+    const col = d.serviceChart.datasets.find(ds => ds.label===lbl)?.color||'#888';
+    return `<div class="cli"><div class="cld" style="background:${col}"></div>${lbl}</div>`;
+  }).join('');
+
+  const navH = d.navSections.map((nav, idx) => `
+    <div class="nav-item${isSierra?' sn-nav':''} ${idx===0?'active':''}"
+         onclick="showSection('${v}','${nav.id}',this)">
+      <span class="ndot" style="background:${nav.dot}"></span>
+      <span class="nl">${nav.label}</span>
+      ${nav.count?`<span class="nc">${nav.count}</span>`:''}
     </div>`).join('');
 
-  // Chart legend
-  const legendHtml = d.serviceChart.legend.map((lbl, i) => {
-    const col = d.serviceChart.datasets.find(ds => ds.label === lbl)?.color || '#888';
-    return `<div class="legend-item"><div class="legend-dot" style="background:${col}"></div>${lbl}</div>`;
-  }).join('');
-
-  // Nav sidebar
-  const navHtml = d.navSections.map((nav, idx) => {
-    const dotColor = DOT_COLORS[nav.dot] || '#888';
-    const isFirst = idx === 0;
-    return `
-      <div class="nav-item${isSierra?' sierra-nav':''} ${isFirst?'active':''}"
-           onclick="showSection('${v}','${nav.id}',this)">
-        <span class="nav-dot" style="background:${dotColor}"></span>
-        <span class="nav-label">${nav.label}</span>
-        ${nav.count ? `<span class="nav-count">${nav.count}</span>` : ''}
-      </div>`;
-  }).join('');
-
-  return `
-<div class="vehicle-panel${v==='cayman'?' active':''}" id="panel-${v}">
-  <header${isSierra?' class="sierra-header"':''}>
-    <div class="header-eyebrow${isSierra?' sierra':''}">${d.meta.eyebrow}</div>
-    <h1>${d.meta.make} <span class="${isSierra?'sierra':'cayman'}-accent">${d.meta.model}</span><br>${d.meta.subtitle}</h1>
-    <div class="header-meta">
-      <div class="meta-item"><span class="meta-label">First Service</span><span class="meta-value">${d.meta.firstService}</span></div>
-      <div class="meta-item"><span class="meta-label">Latest Service</span><span class="meta-value">${d.meta.latestService}</span></div>
-      <div class="meta-item"><span class="meta-label">Current Odometer</span><span class="meta-value">${d.meta.odometer}</span></div>
-      <div class="meta-item"><span class="meta-label">Color</span><span class="meta-value">${d.meta.color}</span></div>
-      <div class="meta-item"><span class="meta-label">Ownership Since</span><span class="meta-value">${d.meta.ownedSince}</span></div>
+  return `<div class="vehicle-panel${v==='cayman'?' active':''}" id="panel-${v}">
+  <header${isSierra?' class="sh"':''}>
+    <div class="h-eye${isSierra?' s':''}">${d.meta.eyebrow}</div>
+    <h1>${d.meta.make} <span class="${isSierra?'sia':'ca'}">${d.meta.model}</span><br>${d.meta.subtitle}</h1>
+    <div class="h-meta">
+      <div class="mi"><span class="ml">First Service</span><span class="mv">${d.meta.firstService}</span></div>
+      <div class="mi"><span class="ml">Latest Service</span><span class="mv">${d.meta.latestService}</span></div>
+      <div class="mi"><span class="ml">Current Odometer</span><span class="mv">${d.meta.odometer}</span></div>
+      <div class="mi"><span class="ml">Color</span><span class="mv">${d.meta.color}</span></div>
+      <div class="mi"><span class="ml">Ownership Since</span><span class="mv">${d.meta.ownedSince}</span></div>
     </div>
   </header>
-
-  <div class="stats-bar">${statsHtml}</div>
-
+  <div class="stats-bar">${statsH}</div>
   <div class="charts-band">
     <div class="chart-pane">
-      <div class="chart-title">Service Events by Type — Timeline</div>
-      <canvas id="${v}-serviceChart" height="95"></canvas>
-      <div class="chart-legend">${legendHtml}</div>
+      <div class="ct">Service Events by Type — Timeline</div>
+      <canvas id="${v}-sc" height="95"></canvas>
+      <div class="cleg">${legH}</div>
     </div>
     <div class="chart-pane">
-      <div class="chart-title">Estimated Miles Driven Per Year</div>
-      <canvas id="${v}-milesChart" height="95"></canvas>
+      <div class="ct">Estimated Miles Driven Per Year</div>
+      <canvas id="${v}-mc" height="95"></canvas>
     </div>
   </div>
-
   <div class="main">
     <nav class="sidebar">
       <div class="sidebar-title">Sections</div>
-      ${navHtml}
+      ${navH}
     </nav>
-    <div class="content">
-      ${buildSections(v)}
-    </div>
+    <div class="content">${buildSections(v)}</div>
   </div>
 </div>`;
 }
 
-// ── BUILD TABS ────────────────────────────────────────────────
+// ── BUILD TABS ─────────────────────────────────────────────────
 function buildTabs() {
-  const tabsEl = document.getElementById('vehicle-tabs');
+  const el = document.getElementById('vtabs');
   Object.keys(GARAGE).forEach(v => {
     const d = GARAGE[v];
-    const isFirst = v === 'cayman';
+    const isFirst = v==='cayman';
     const div = document.createElement('div');
     div.className = `vtab${isFirst?' active-'+v:''}`;
     div.id = `tab-${v}`;
-    div.setAttribute('onclick', `switchVehicle('${v}')`);
+    div.setAttribute('onclick',`switchVehicle('${v}')`);
     div.innerHTML = `<span>${d.meta.model}</span><span class="vtab-badge vtab-badge-${v}">${d.meta.make}</span>`;
-    tabsEl.insertBefore(div, tabsEl.querySelector('.search-wrap'));
+    el.insertBefore(div, el.querySelector('.search-wrap'));
   });
 }
 
-// ── RENDER EVERYTHING ─────────────────────────────────────────
+// ── INIT ───────────────────────────────────────────────────────
+let chartsInited = {};
 document.addEventListener('DOMContentLoaded', () => {
   buildTabs();
-  const container = document.getElementById('panels-container');
-  Object.keys(GARAGE).forEach(v => {
-    container.innerHTML += buildPanel(v);
-  });
-  // Init charts for the default visible panel
+  const c = document.getElementById('panels');
+  Object.keys(GARAGE).forEach(v => { c.innerHTML += buildPanel(v); });
   initCharts('cayman');
-  chartsInitialized['cayman'] = true;
+  chartsInited['cayman'] = true;
 });
-
-// ── TAB SWITCHING ────────────────────────────────────────────
-let chartsInitialized = {};
 
 function switchVehicle(v) {
   document.querySelectorAll('.vehicle-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.vtab').forEach(t => {
-    t.className = 'vtab';
-  });
-  document.getElementById('panel-' + v).classList.add('active');
-  document.getElementById('tab-' + v).classList.add('active-' + v);
-  if (!chartsInitialized[v]) { initCharts(v); chartsInitialized[v] = true; }
+  document.querySelectorAll('.vtab').forEach(t => { t.className='vtab'; });
+  document.getElementById('panel-'+v).classList.add('active');
+  document.getElementById('tab-'+v).classList.add('active-'+v);
+  if (!chartsInited[v]) { initCharts(v); chartsInited[v]=true; }
 }
 
-// ── SECTION SWITCHING ────────────────────────────────────────
 function showSection(vehicle, id, el) {
-  const panel = document.getElementById('panel-' + vehicle);
+  const panel = document.getElementById('panel-'+vehicle);
   panel.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
   panel.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById(vehicle + '-' + id).classList.add('visible');
+  document.getElementById(vehicle+'-'+id).classList.add('visible');
   el.classList.add('active');
 }
 
-// ── CHART DEFAULTS ───────────────────────────────────────────
-Chart.defaults.color = '#888';
-Chart.defaults.font.family = "'DM Mono', monospace";
-Chart.defaults.font.size = 10;
-const gridColor = 'rgba(255,255,255,0.05)';
-const borderColor = 'rgba(255,255,255,0.08)';
-const tooltipDefaults = {
-  backgroundColor: '#161616',
-  borderColor: '#242424',
-  borderWidth: 1,
-  titleColor: '#c8a96e',
-  bodyColor: '#d8d0c4',
-  padding: 10
-};
+// ── CHARTS ─────────────────────────────────────────────────────
+Chart.defaults.color='#888';
+Chart.defaults.font.family="'DM Mono',monospace";
+Chart.defaults.font.size=10;
+const gc='rgba(255,255,255,.05)', bc='rgba(255,255,255,.08)';
+const ttDef={backgroundColor:'#161616',borderColor:'#242424',borderWidth:1,bodyColor:'#d8d0c4',padding:10};
+const mkScales=stacked=>({
+  x:{stacked,grid:{color:gc},border:{color:bc},ticks:{color:'#888',font:{size:10}}},
+  y:{stacked,grid:{color:gc},border:{color:bc},ticks:{color:'#888',font:{size:10},stepSize:1,callback:v=>v===0?'':v},min:0}
+});
+const mkMiScales=()=>({
+  x:{grid:{color:gc},border:{color:bc},ticks:{color:'#888',font:{size:10}}},
+  y:{grid:{color:gc},border:{color:bc},ticks:{color:'#888',font:{size:10},callback:v=>v===0?'':(v/1000).toFixed(0)+'k'},min:0}
+});
 
-function makeScales(stacked) {
-  return {
-    x: { stacked, grid:{color:gridColor}, border:{color:borderColor}, ticks:{color:'#888',font:{size:10}} },
-    y: { stacked, grid:{color:gridColor}, border:{color:borderColor}, ticks:{color:'#888',font:{size:10},stepSize:1,callback:v=>v===0?'':v}, min:0 }
-  };
-}
-function makeMilesScales() {
-  return {
-    x: { grid:{color:gridColor}, border:{color:borderColor}, ticks:{color:'#888',font:{size:10}} },
-    y: { grid:{color:gridColor}, border:{color:borderColor}, ticks:{color:'#888',font:{size:10},callback:v=>v===0?'':(v/1000).toFixed(0)+'k'}, min:0 }
-  };
-}
-
-// ── INIT CHARTS FROM DATA ─────────────────────────────────────
 function initCharts(v) {
   const d = GARAGE[v];
-  const isSierra = v === 'sierra';
+  const isSierra = v==='sierra';
+  const titleColor = isSierra ? '#5b9bd5' : '#c8a96e';
 
-  // Service type stacked bar
-  new Chart(document.getElementById(v + '-serviceChart'), {
-    type: 'bar',
-    data: {
-      labels: d.serviceChart.labels,
-      datasets: d.serviceChart.datasets.map(ds => ({
-        label: ds.label,
-        backgroundColor: ds.color,
-        data: ds.data,
-      }))
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          ...tooltipDefaults,
-          titleColor: isSierra ? '#5b9bd5' : '#c8a96e',
-          callbacks: {
-            title: ctx => 'Year: ' + ctx[0].label,
-            label: ctx => ' ' + ctx.dataset.label + ': ' + ctx.raw,
-          }
-        }
-      },
-      scales: makeScales(true)
-    }
+  new Chart(document.getElementById(v+'-sc'),{
+    type:'bar',
+    data:{labels:d.serviceChart.labels,datasets:d.serviceChart.datasets.map(ds=>({label:ds.label,backgroundColor:ds.color,data:ds.data}))},
+    options:{responsive:true,plugins:{legend:{display:false},tooltip:{...ttDef,titleColor,callbacks:{title:ctx=>'Year: '+ctx[0].label,label:ctx=>' '+ctx.dataset.label+': '+ctx.raw}}},scales:mkScales(true)}
   });
 
-  // Miles per year bar
-  const mpy = d.milesPerYear;
-  const avg = Math.round(mpy.data.slice(0, mpy.partialYearIndex).reduce((s,n)=>s+n,0) / mpy.partialYearIndex);
-  const accentFull  = isSierra ? '#5b9bd5' : '#c8a96e';
-  const accentFaded = isSierra ? 'rgba(91,155,213,0.35)' : 'rgba(200,169,110,0.35)';
-  const lineColor   = isSierra ? 'rgba(200,169,110,0.5)'  : 'rgba(91,155,213,0.5)';
+  const mpy=d.milesPerYear;
+  const avg=Math.round(mpy.data.slice(0,mpy.partial).reduce((s,n)=>s+n,0)/mpy.partial);
+  const af=isSierra?'#5b9bd5':'#c8a96e';
+  const afd=isSierra?'rgba(91,155,213,.35)':'rgba(200,169,110,.35)';
+  const lc=isSierra?'rgba(200,169,110,.5)':'rgba(91,155,213,.5)';
 
-  new Chart(document.getElementById(v + '-milesChart'), {
-    type: 'bar',
-    data: {
-      labels: mpy.labels,
-      datasets: [
-        {
-          label: 'Miles',
-          data: mpy.data,
-          backgroundColor: mpy.data.map((m, i) =>
-            i === mpy.partialYearIndex ? accentFaded : m > avg ? accentFull : '#2e2e2e'
-          ),
-          borderColor: mpy.data.map((_, i) => i === mpy.partialYearIndex ? accentFull : 'transparent'),
-          borderWidth: 1,
-        },
-        {
-          label: 'Average',
-          type: 'line',
-          data: mpy.data.map(() => avg),
-          borderColor: lineColor,
-          borderWidth: 1,
-          borderDash: [4, 3],
-          pointRadius: 0,
-          fill: false,
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          ...tooltipDefaults,
-          titleColor: isSierra ? '#5b9bd5' : '#c8a96e',
-          callbacks: {
-            title: ctx => ctx[0].label + (ctx[0].dataIndex === mpy.partialYearIndex ? ' (partial)' : ''),
-            label: ctx => ctx.dataset.label === 'Average'
-              ? ' Avg: ' + avg.toLocaleString() + ' mi/yr'
-              : ' Miles: ' + ctx.raw.toLocaleString()
-          }
-        }
-      },
-      scales: makeMilesScales()
-    }
+  new Chart(document.getElementById(v+'-mc'),{
+    type:'bar',
+    data:{labels:mpy.labels,datasets:[
+      {label:'Miles',data:mpy.data,backgroundColor:mpy.data.map((m,i)=>i===mpy.partial?afd:m>avg?af:'#2e2e2e'),borderColor:mpy.data.map((_,i)=>i===mpy.partial?af:'transparent'),borderWidth:1},
+      {label:'Average',type:'line',data:mpy.data.map(()=>avg),borderColor:lc,borderWidth:1,borderDash:[4,3],pointRadius:0,fill:false}
+    ]},
+    options:{responsive:true,plugins:{legend:{display:false},tooltip:{...ttDef,titleColor,callbacks:{
+      title:ctx=>ctx[0].label+(ctx[0].dataIndex===mpy.partial?' (partial)':''),
+      label:ctx=>ctx.dataset.label==='Average'?' Avg: '+avg.toLocaleString()+' mi/yr':' Miles: '+ctx.raw.toLocaleString()
+    }}},scales:mkMiScales()}
   });
 }
 
-// ── SEARCH ────────────────────────────────────────────────────
-// Build flat search index from GARAGE data
-function buildSearchIndex() {
-  const index = [];
-  Object.keys(GARAGE).forEach(v => {
-    const d = GARAGE[v];
-    d.timeline.forEach(item => {
-      const odo = item.date.includes('·') ? item.date.split('·')[1].trim() : '';
-      const date = item.date.split('·')[0].trim();
-      index.push({
-        vehicle: v,
-        label: d.meta.make + ' ' + d.meta.model,
-        date, odo,
-        shop: item.shop,
-        title: item.title,
-        tags: item.tags.map(t => TAG_STYLES[t]?.label || t),
-      });
+// ── SEARCH ─────────────────────────────────────────────────────
+function buildIdx() {
+  const idx=[];
+  Object.keys(GARAGE).forEach(v=>{
+    GARAGE[v].timeline.forEach(item=>{
+      const odo=item.date.includes('·')?item.date.split('·')[1].trim():'';
+      idx.push({v,label:GARAGE[v].meta.make+' '+GARAGE[v].meta.model,
+        date:item.date.split('·')[0].trim(),odo,shop:item.shop,title:item.title,
+        tags:item.tags.map(t=>TS[t]?.label||t)});
     });
   });
-  return index;
+  return idx;
 }
 
-const TAG_COLORS_SEARCH = Object.fromEntries(
-  Object.entries(TAG_STYLES).map(([k, v]) => [v.label, v.color])
-);
-
-function highlight(text, query) {
-  if (!query) return text;
-  const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  return text.replace(new RegExp(`(${escaped})`, 'gi'), '<mark>$1</mark>');
+function hl(text,q){
+  if(!q)return text;
+  return text.replace(new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi'),'<mark>$1</mark>');
 }
 
-function onSearch(val) {
-  const q = val.trim().toLowerCase();
-  const resultsEl = document.getElementById('search-results');
-  const clearBtn  = document.getElementById('search-clear');
-  const listEl    = document.getElementById('sr-list');
-  const countEl   = document.getElementById('sr-count');
-
-  clearBtn.style.display = q ? 'block' : 'none';
-  if (!q) { resultsEl.style.display = 'none'; return; }
-
-  const index = buildSearchIndex();
-  const matches = index.filter(r =>
-    r.title.toLowerCase().includes(q) ||
-    r.shop.toLowerCase().includes(q) ||
-    r.date.toLowerCase().includes(q) ||
-    r.tags.some(t => t.toLowerCase().includes(q)) ||
-    r.label.toLowerCase().includes(q) ||
-    r.odo.toLowerCase().includes(q)
+function onSearch(val){
+  const q=val.trim().toLowerCase();
+  const re=document.getElementById('search-results'),cl=document.getElementById('scl');
+  const li=document.getElementById('srl'),cnt=document.getElementById('src');
+  cl.style.display=q?'block':'none';
+  if(!q){re.style.display='none';return;}
+  const matches=buildIdx().filter(r=>
+    r.title.toLowerCase().includes(q)||r.shop.toLowerCase().includes(q)||
+    r.date.toLowerCase().includes(q)||r.tags.some(t=>t.toLowerCase().includes(q))||
+    r.label.toLowerCase().includes(q)||r.odo.toLowerCase().includes(q)
   );
-
-  countEl.textContent = matches.length + ' result' + (matches.length !== 1 ? 's' : '');
-
-  if (matches.length === 0) {
-    listEl.innerHTML = `<div class="sr-empty">No records found for "${val}"</div>`;
-  } else {
-    listEl.innerHTML = matches.map(r => {
-      const tagHtml = r.tags.map(t => {
-        const col = TAG_COLORS_SEARCH[t] || '#888';
-        return `<span class="tag" style="color:${col};border-color:${col}33;background:${col}12">${t}</span>`;
-      }).join('');
-      const meta = [r.date, r.odo, r.shop].filter(Boolean).join(' · ');
-      const safeTitle = r.title.replace(/'/g, "\\'");
-      const safeVehicle = r.vehicle;
-      return `<div class="sr-item" onclick="goToRecord('${safeVehicle}', '${safeTitle}')">
-        <span class="sr-badge ${r.vehicle}">${r.label}</span>
-        <div class="sr-body">
-          <div class="sr-title">${highlight(r.title, val)}</div>
-          <div class="sr-meta">${highlight(meta, val)}</div>
-          <div class="sr-tags" style="margin-top:5px">${tagHtml}</div>
+  cnt.textContent=matches.length+' result'+(matches.length!==1?'s':'');
+  if(!matches.length){li.innerHTML=`<div class="srempty">No records found for "${val}"</div>`;}
+  else{
+    li.innerHTML=matches.map(r=>{
+      const th=r.tags.map(t=>{const ts=Object.values(TS).find(s=>s.label===t);const c=ts?.color||'#888';return`<span class="tag" style="color:${c};border-color:${c}33;background:${c}12">${t}</span>`;}).join('');
+      const meta=[r.date,r.odo,r.shop].filter(Boolean).join(' · ');
+      return`<div class="sri" onclick="goToRecord('${r.v}','${r.title.replace(/'/g,"\\'")}')">
+        <span class="srb ${r.v}">${r.label}</span>
+        <div class="srbody">
+          <div class="srtitle">${hl(r.title,val)}</div>
+          <div class="srmeta">${hl(meta,val)}</div>
+          <div class="srtags">${th}</div>
         </div>
       </div>`;
     }).join('');
   }
-  resultsEl.style.display = 'block';
+  re.style.display='block';
 }
 
-function goToRecord(vehicle, title) {
-  clearSearch();
-  switchVehicle(vehicle);
-  const panel = document.getElementById('panel-' + vehicle);
-  panel.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
-  panel.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById(vehicle + '-timeline').classList.add('visible');
+function goToRecord(v,title){
+  clearSearch(); switchVehicle(v);
+  const panel=document.getElementById('panel-'+v);
+  panel.querySelectorAll('.section').forEach(s=>s.classList.remove('visible'));
+  panel.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById(v+'-timeline').classList.add('visible');
   panel.querySelectorAll('.nav-item')[1].classList.add('active');
-
-  const timelineItems = panel.querySelectorAll('#' + vehicle + '-timeline .timeline-item');
-  let targetEl = null;
-  timelineItems.forEach(item => {
-    const titleEl = item.querySelector('.tl-title');
-    if (titleEl && titleEl.textContent.trim() === title.trim()) targetEl = item;
+  let target=null;
+  panel.querySelectorAll('#'+v+'-timeline .tli').forEach(el=>{
+    if(el.querySelector('.tt')?.textContent.trim()===title.trim()) target=el;
   });
-  if (!targetEl) return;
-
-  panel.querySelectorAll('.timeline-item.search-hit').forEach(el => {
-    el.classList.remove('search-hit', 'sierra-hit');
-  });
-  targetEl.classList.add('search-hit');
-  if (vehicle === 'sierra') targetEl.classList.add('sierra-hit');
-
-  setTimeout(() => { targetEl.scrollIntoView({ behavior:'smooth', block:'center' }); }, 80);
-  setTimeout(() => { targetEl.classList.remove('search-hit', 'sierra-hit'); }, 2200);
+  if(!target)return;
+  panel.querySelectorAll('.tli.hit').forEach(el=>el.classList.remove('hit','shits'));
+  target.classList.add('hit');
+  if(v==='sierra') target.classList.add('shits');
+  setTimeout(()=>target.scrollIntoView({behavior:'smooth',block:'center'}),80);
+  setTimeout(()=>target.classList.remove('hit','shits'),2200);
 }
 
-function clearSearch() {
-  document.getElementById('search-input').value = '';
-  document.getElementById('search-results').style.display = 'none';
-  document.getElementById('search-clear').style.display = 'none';
+function clearSearch(){
+  document.getElementById('search-input').value='';
+  document.getElementById('search-results').style.display='none';
+  document.getElementById('scl').style.display='none';
 }
 
-document.addEventListener('click', e => {
-  const sr = document.getElementById('search-results');
-  const inp = document.getElementById('search-input');
-  if (sr && !sr.contains(e.target) && e.target !== inp) sr.style.display = 'none';
+document.addEventListener('click',e=>{
+  const sr=document.getElementById('search-results'),inp=document.getElementById('search-input');
+  if(sr&&!sr.contains(e.target)&&e.target!==inp) sr.style.display='none';
 });
-
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('search-input').addEventListener('focus', () => {
-    if (document.getElementById('search-input').value.trim()) {
-      document.getElementById('search-results').style.display = 'block';
-    }
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('search-input').addEventListener('focus',()=>{
+    if(document.getElementById('search-input').value.trim())
+      document.getElementById('search-results').style.display='block';
   });
 });
 </script>
