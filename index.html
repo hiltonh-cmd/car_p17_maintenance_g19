@@ -976,15 +976,9 @@ const GARAGE = {
       },
     },
     navSections: [
-      { id:'overview',    label:'Overview',          dot:'dot-routine',   count:'' },
-      { id:'timeline',    label:'Full Timeline',     dot:'accent',        count:'35' },
-      { id:'engine',      label:'Engine & Drivetrain',dot:'dot-engine',   count:'6' },
-      { id:'brakes',      label:'Brakes',            dot:'dot-brake',     count:'4' },
-      { id:'cooling',     label:'Cooling System',    dot:'dot-cooling',   count:'7' },
-      { id:'turbo',       label:'Turbocharger',      dot:'dot-turbo',     count:'1' },
-      { id:'electrical',  label:'Electrical',        dot:'dot-electrical',count:'2' },
-      { id:'tires',       label:'Tires & Alignment', dot:'grey',          count:'5' },
-      { id:'shops',       label:'Service Shops',     dot:'purple',        count:'' },
+      { id:'overview',    label:'Overview',      dot:'dot-routine', count:'' },
+      { id:'timeline',    label:'Full Timeline', dot:'accent',      count:'35' },
+      { id:'shops',       label:'Service Shops', dot:'purple',      count:'' },
     ],
     timeline: [
       { dot:'major', date:'Mar 2026 · 71,774 mi', title:'Turbocharger Replaced + Oil Line Seals',           shop:'European Service Center',  tags:['turbo','major'] },
@@ -1068,15 +1062,9 @@ const GARAGE = {
       },
     },
     navSections: [
-      { id:'overview',     label:'Overview',           dot:'dot-routine',      count:'' },
-      { id:'timeline',     label:'Full Timeline',      dot:'sierra-accent',    count:'38' },
-      { id:'engine',       label:'Engine & Oil',       dot:'dot-engine',       count:'15' },
-      { id:'transmission', label:'Transmission',       dot:'dot-transmission', count:'3' },
-      { id:'fuel',         label:'Fuel & Spark',       dot:'dot-fuel',         count:'2' },
-      { id:'brakes',       label:'Brakes',             dot:'dot-brake',        count:'2' },
-      { id:'tires',        label:'Tires & Alignment',  dot:'grey',             count:'8' },
-      { id:'electrical',   label:'Electrical',         dot:'dot-electrical',   count:'2' },
-      { id:'shops',        label:'Service Shops',      dot:'purple',           count:'' },
+      { id:'overview',  label:'Overview',      dot:'dot-routine',   count:'' },
+      { id:'timeline',  label:'Full Timeline', dot:'sierra-accent', count:'38' },
+      { id:'shops',     label:'Service Shops', dot:'purple',        count:'' },
     ],
     timeline: [
       { dot:'sierra', date:'Jan 2026 · 86,484 mi', title:'4 Tires Replaced (DIY)',                                    shop:'Self-Service',                      tags:['tires'] },
@@ -1327,9 +1315,21 @@ function filterTimeline(v, tag, el) {
   container.querySelectorAll('.timeline-item').forEach(item => {
     if (tag === 'all') {
       item.classList.remove('tl-hidden');
+      item.style.animation = 'none';
+      item.offsetHeight;
+      item.style.animation = '';
+      item.style.opacity = '1';
     } else {
       const itemTags = (item.dataset.tags || '').split(',');
-      item.classList.toggle('tl-hidden', !itemTags.includes(tag));
+      const hide = !itemTags.includes(tag);
+      item.classList.toggle('tl-hidden', hide);
+      // Re-trigger animation so newly-shown items aren't stuck at opacity:0
+      if (!hide) {
+        item.style.animation = 'none';
+        item.offsetHeight; // force reflow
+        item.style.animation = '';
+        item.style.opacity = '1';
+      }
     }
   });
 }
@@ -1398,7 +1398,7 @@ function buildSections(v) {
         engine:['engine'], brakes:['brake'], cooling:['cooling'], turbo:['turbo','major'],
         electrical:['electrical'], tires:['tires'], transmission:['transmission'], fuel:['fuel'],
       };
-      const filterTags = tagMap[nav.id] || [nav.id];
+      const filterTags = nav.filterTags || tagMap[nav.id] || [nav.id];
       const items = d.timeline.filter(t => t.tags.some(tag => filterTags.includes(tag)));
 
       html += `
